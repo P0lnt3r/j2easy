@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.system.mapper.AccountMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.system.entity.Account"  extends="common.BaseEntityResultMap">
+        <result column="USERNAME" property="username" />
+        <result column="PASSWORD" property="password" />
+        <result column="STATE" property="state" />
+        <result column="SALT" property="salt" />
+        <result column="UNLOCK_TIME" property="unlockTime" />
+        <result column="RETRY_COUNT" property="retryCount" />
+        <result column="REALM" property="realm" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        USERNAME, PASSWORD, STATE, SALT, UNLOCK_TIME, RETRY_COUNT, REALM
+    </sql>
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM tb_system_account WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.username != null and '' != params.username">AND USERNAME = #{params.username}</if>
+        <if test="params.password != null and '' != params.password">AND PASSWORD = #{params.password}</if>
+        <if test="params.state != null and '' != params.state">AND STATE = #{params.state}</if>
+        <if test="params.salt != null and '' != params.salt">AND SALT = #{params.salt}</if>
+        <if test="params.unlockTime != null and '' != params.unlockTime">AND UNLOCK_TIME = #{params.unlockTime}</if>
+        <if test="params.retryCount != null and '' != params.retryCount">AND RETRY_COUNT = #{params.retryCount}</if>
+        <if test="params.realm != null and '' != params.realm">AND REALM = #{params.realm}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            AND ( 1 != 1
+              OR USERNAME LIKE CONCAT('%',#{params.keywords},'%')
+              OR PASSWORD LIKE CONCAT('%',#{params.keywords},'%')
+              OR SALT LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+</mapper>

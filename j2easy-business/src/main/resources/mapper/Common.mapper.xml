@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+
+	<resultMap type="zy.pointer.j2easy.framework.repository.BaseEntity" id="BaseEntityResultMap">
+		<result column="_ID" property="id" />							<!-- 物理ID -->
+		<result column="_CREATE_TIME" property="createTime" />			<!-- 数据创建时间 -->
+		<result column="_UPDATE_TIME" property="updateTime" />			<!-- 数据更新时间 -->
+		<result column="_UPDATE_TRACE" property="updateTrace" />		<!-- Trace -->
+		<result column="_DB_STATE" property="dbState" />				<!-- 数据保存状态 -->
+	</resultMap>
+
+</mapper>

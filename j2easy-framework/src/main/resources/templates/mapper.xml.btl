@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${package.Mapper}.${table.mapperName}">
+
+<% if(enableCache){ %>
+    <!-- 开启二级缓存 -->
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+<% } %>
+
+<% if(baseResultMap){ %>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="${package.Entity}.${entity}"  extends="common.BaseEntityResultMap">
+<% for(field in table.fields){ %>
+   <% /** 生成普通字段 **/ %>
+   <% if(!field.keyFlag){ %>
+        <result column="${field.name}" property="${field.propertyName}" />
+   <% } %>
+<% } %>
+    </resultMap>
+<% } %>
+
+<% if(baseColumnList){ %>
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+<% for(field in table.commonFields){ %>
+        ${field.name},
+<% } %>
+        ${table.fieldNames}
+    </sql>
+<% } %>
+
+<select id="selectByMapForPage" resultMap="baseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM ${table.name} WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <% for(field in table.fields){ %>
+        <% if(!field.keyFlag){ %><if test="params.${field.propertyName} != null and '' != params.${field.propertyName}">AND ${field.name} = #{params.${field.propertyName}}</if><% } %>
+        <% } %>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              <% for(field in table.fields){ %>
+                 <% if( !field.keyFlag && @field.getType().startsWith('varchar') ){%>
+              OR ${field.name} LIKE CONCAT('%',#{params.keywords},'%')
+                 <% }%>
+              <% } %>
+            )
+         </if>
+</select>
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<!-- 最好使用绝对路径 -->
+    <property name="LOG_HOME" value="/opt/logs/j2easy"/>
+
+    <!-- %m输出的信息,%p日志级别,%t线程名,%d日期,%c类的全名,%i索引【从数字0开始递增】,,, -->
+    <!-- appender是configuration的子节点，是负责写日志的组件。 -->
+    <!-- ConsoleAppender：把日志输出到控制台 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%green([%d{yyyy-MM-dd HH:mm:ss.SSS}]) %highlight(%-5level) %red([%X{trace}]) %boldMagenta(%-40file:%-4line) - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!--info和error分开打印-->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

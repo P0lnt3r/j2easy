@@ -1,0 +1,38 @@
+jwt:
+  signature:
+    secretkey: 8db801f3edf24d318f7bba30420e0b61
+
+spring:
+  # 环境配置 : dev:开发环境 , test:测试环境 , prod:生产环境
+  profiles:
+    active: dev
+
+  # 国际化资源配置
+  messages:
+    basename: i18n/messages , i18n/error_code
+    encoding: UTF-8
+
+  # 数据源配置
+  datasource:
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    #driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:p6spy:mysql://localhost:3306/j2easy?serverTimezone=UTC&useSSL=false&characterEncoding=utf8
+    username: root
+    password: 123456
+
+  # Redis 缓存配置
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
+  # Spring-MVC 配置
+  mvc:
+    # 屏蔽 Springboot 默认的一些错误处理,出现异常向外抛给 Advisor 进行处理
+    throw-exception-if-no-handler-found: true
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: dbState
+      logic-delete-value: 0
+      logic-not-delete-value: 1

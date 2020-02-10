@@ -1,0 +1,40 @@
+1.> What's JWT
+
+    http://www.ruanyifeng.com/blog/2018/07/json_web_token-tutorial.html
+
+    JWT 的 明文组成部分 :
+    {
+        "header" : "" ,     // 头部
+        "payload": "" ,     // 载体数据
+        "signature": ""     // 签名
+    }
+
+    JWT 的 密文结构
+    Base64URLEncode( header ) + "." + Base64URLEncode( payload ) + "." + Base64URLEncode( signature )
+
+    1.1 > Header
+    {
+       "alg": ""    // 签名算法 [必须属性]
+    }
+    当然也可以在 header 中扩展属性.但是约定上最好指明签名算法,一般使用 HMAC-SHA256 简写:HS256
+
+    1.2 > Payload ( JWT 的消息体 )
+    {
+        iss (issuer)：签发人
+        exp (expiration time)：过期时间
+        sub (subject)：主题
+        aud (audience)：受众
+        nbf (Not Before)：生效时间
+        iat (Issued At)：签发时间
+        jti (JWT ID)：编号
+    }
+
+    1.3 > Signature
+
+    就是编码后的 header + payload 进行数据签名.
+
+    = base64UrlEncode (
+        sign( base64UrlEncode( header ) + "." + base64UrlEncode( payload ) )
+    );
+
+
