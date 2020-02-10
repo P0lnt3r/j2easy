@@ -6,7 +6,7 @@ package zy.pointer.j2easy.business.commons;
  */
 public enum  DictConstant {
 
-    SYSTEM_PERMISSION_TYPE_MENU( "1" , "system.permission.type.menu" , "权限类型:菜单" ),
+    SYSTEM_PERMISSION_TYPE_MENU( "1" , "system.permission.type.menu" , "权限类型:菜单1AA" ),
     SYSTEM_PERMISSION_TYPE_FUNC( "2" , "system.permission.type.func" , "权限类型:功能" ),
 
     SYSTEM_PERMISSION_STATE_ACTIVE( "1" , "system.permission.state.active" , "权限状态:正常" ),
