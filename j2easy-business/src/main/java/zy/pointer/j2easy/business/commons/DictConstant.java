@@ -23,6 +23,8 @@ public enum  DictConstant {
         this.desc = desc;
     }
 
+
+
     public String code() {
         return code;
     }

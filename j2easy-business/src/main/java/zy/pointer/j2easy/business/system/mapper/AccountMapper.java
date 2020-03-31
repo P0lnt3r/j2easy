@@ -13,4 +13,6 @@ import zy.pointer.j2easy.framework.repository.RepositoryMapper;
  */
 public interface AccountMapper extends RepositoryMapper<Account> {
 
+
+
 }

@@ -16,6 +16,8 @@ public class PathTree <T> implements Serializable {
         root = new PathTreeNode<>( "/" , "root" , null );
     }
 
+
+
     public static void main(String[] args) {
 
         PathTree tree = new PathTree();
@@ -44,16 +46,20 @@ public class PathTree <T> implements Serializable {
     }
 
     public void put ( PathTreeNode node ){
+        if ( node.getPath().equals( root.getPath() ) ){
+            root.setPayload( (T) node.getPayload() );
+            return;
+        }
         PathTreeNode parent = getParent( node.getPath() );
-        if ( parent.getChildrens() == null ){
-            parent.setChildrens( new ArrayList< PathTreeNode >() );
+        if ( parent.getChildren() == null ){
+            parent.setChildren( new ArrayList< PathTreeNode >() );
         }
 
         PathTreeNode existsNode = getPathTreeNode( parent , node.getPath() )  ;
         if ( existsNode != null ){
             existsNode.setPayload( node.getPayload() );
         }else{
-            parent.getChildrens().add( node );
+            parent.getChildren().add( node );
         }
 
     }
@@ -81,11 +87,11 @@ public class PathTree <T> implements Serializable {
      * @return
      */
     private PathTreeNode getPathTreeNode( PathTreeNode parent , String path ){
-        if ( parent.getChildrens() == null ){
-            parent.setChildrens( new ArrayList<>() );
+        if ( parent.getChildren() == null ){
+            parent.setChildren( new ArrayList<>() );
         }
-        List<PathTreeNode> childrens = parent.getChildrens();
-        Optional<PathTreeNode> _target = childrens.stream()
+        List<PathTreeNode> children = parent.getChildren();
+        Optional<PathTreeNode> _target = children.stream()
                 .filter( node -> path.equals( node.getPath() ) )
                 .findFirst();
         return _target.isPresent() ? _target.get() : null;
@@ -101,7 +107,7 @@ public class PathTree <T> implements Serializable {
         PathTreeNode target = getPathTreeNode( parent , path );
         if ( target == null ){
             target = new PathTreeNode( path , null , null );
-            parent.getChildrens().add( target );
+            parent.getChildren().add( target );
         }
         return target;
     }

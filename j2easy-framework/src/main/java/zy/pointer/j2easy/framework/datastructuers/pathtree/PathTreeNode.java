@@ -3,12 +3,32 @@ package zy.pointer.j2easy.framework.datastructuers.pathtree;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
  */
 public class PathTreeNode <T> implements Serializable {
+
+    public <Obj extends SelfRefChildrenListObject> Obj convert(Class<Obj> clazz , PathTreeNodeConvertHandler<Obj> handler ) throws IllegalAccessException, InstantiationException {
+        Obj obj = handler.convert( this , clazz.newInstance() );
+        if ( this.getChildren() != null && !this.getChildren().isEmpty() ){
+            List<SelfRefChildrenListObject> children = this.getChildren().stream().map(node -> {
+                try {
+                    return node.convert( clazz , handler);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            } ).collect(Collectors.toList());
+            obj.setChildren(children);
+        }
+        return obj;
+    }
 
     public PathTreeNode( String path , String name , T payload ){
         this.path = path;
@@ -25,7 +45,7 @@ public class PathTreeNode <T> implements Serializable {
     /**
      * 字辈集合
      */
-    private List<PathTreeNode> childrens;
+    private List<PathTreeNode> children;
 
     /**
      * 排序索引
@@ -89,11 +109,11 @@ public class PathTreeNode <T> implements Serializable {
         this.name = name;
     }
 
-    public List<PathTreeNode> getChildrens() {
-        return childrens;
+    public List<PathTreeNode> getChildren() {
+        return children;
     }
 
-    public void setChildrens(List<PathTreeNode> childrens) {
-        this.childrens = childrens;
+    public void setChildren(List<PathTreeNode> children) {
+        this.children = children;
     }
 }

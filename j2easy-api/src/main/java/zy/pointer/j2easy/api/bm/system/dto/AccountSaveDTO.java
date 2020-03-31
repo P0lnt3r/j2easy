@@ -19,22 +19,17 @@ public class AccountSaveDTO extends AbsDataTransferObject<Account> {
     private String password;
 
     public static void main(String[] args) {
-
         AccountSaveDTO dto = new AccountSaveDTO();
-
         dto.setUsername("123123");
         dto.setPassword("aabbcc");
-
         Account account = dto.convert();
         System.out.println(account);
-
         account = dto.convert( AccountSaveDTO.class , (dto1, account1) -> {
             account1 = dto1.convert();
             account1.setUnlockTime(LocalDateTime.now());
             return account1;
         } );
         System.out.println(account);
-
     }
 
 }

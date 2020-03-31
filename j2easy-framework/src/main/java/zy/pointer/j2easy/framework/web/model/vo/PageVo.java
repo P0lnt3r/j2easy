@@ -42,7 +42,7 @@ public class PageVo<ValueObject extends zy.pointer.j2easy.framework.web.model.vo
             ValueObject vo = constructor.newInstance();
             List<ValueObject> records = page.getRecords().stream().map( entity -> {
                 if ( handler != null ){
-                    return handler.hanlde( entity , vo );
+                    return handler.handle( entity , vo );
                 }
                 return (ValueObject) vo.from( entity , vo.getClass() );
             } ).collect(Collectors.toList());

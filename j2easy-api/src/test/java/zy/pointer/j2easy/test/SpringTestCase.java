@@ -1,5 +1,6 @@
 package zy.pointer.j2easy.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +12,7 @@ import zy.pointer.j2easy.startup.StartUp;
 public class SpringTestCase {
 
     @Test
-    public void test(){
+    public void test() throws JsonProcessingException, InstantiationException, IllegalAccessException {
 
     }
 
