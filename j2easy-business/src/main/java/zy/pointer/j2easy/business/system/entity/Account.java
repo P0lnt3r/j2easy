@@ -13,7 +13,9 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 /**
  * <p>
- * 
+ *      Username 作为登录名,全局唯一.
+ *      Password : 加密方式:
+ *                  MD5 ( MD5( password ) + salt )
  * </p>
  *
  * @author zhouyang

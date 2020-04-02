@@ -13,4 +13,15 @@ import zy.pointer.j2easy.framework.business.BusinessService;
  */
 public interface IAccountService extends BusinessService<Account> {
 
+    int createAccount( String username , String password , Integer realm );
+
+    int login( String username , String password , Integer realm );
+
+    /**
+     * 通过账户名从账户表中获取账户数据
+     * @param username
+     * @return
+     */
+    Account findByUsername( String username );
+
 }

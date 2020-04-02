@@ -169,8 +169,15 @@ public abstract class AbsBusinessService<
     }
 
     @Override
+    public IPage<Entity> page(IPage<Entity> page) {
+        System.out.println("===========================");
+        return getBaseMapper().selectPage(page , null);
+    }
+
+    @Override
     @LogMethod( name = "通过条件MAP查询分页{}")
     public IPage<Entity> selectByMapForPage(Page<Entity> page, Map<String, Object> params) {
+        System.out.println("-------------------------------");
         return getBaseMapper().selectByMapForPage( page , params );
     }
 

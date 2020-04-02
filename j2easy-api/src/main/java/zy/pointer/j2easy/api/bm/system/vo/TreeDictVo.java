@@ -2,11 +2,13 @@ package zy.pointer.j2easy.api.bm.system.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import zy.pointer.j2easy.framework.datastructuers.pathtree.SelfRefChildrenListObject;
 
 import java.util.List;
 
 @ApiModel("字典数据")
+@Data
 public class TreeDictVo extends SelfRefChildrenListObject {
 
     private List<TreeDictVo> children;
@@ -20,36 +22,11 @@ public class TreeDictVo extends SelfRefChildrenListObject {
     @ApiModelProperty("字典主键ID")
     private Long id;
 
+    @ApiModelProperty("字典唯一标识值")
+    private String uniq;
+
     @Override
     public void setChildren(List children) {
         this.children = children;
-    }
-
-    public List<TreeDictVo> getChildren() {
-        return children;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }

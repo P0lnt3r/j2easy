@@ -7,6 +7,7 @@ import lombok.Data;
 import zy.pointer.j2easy.framework.repository.BaseEntity;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +40,17 @@ public class PageVo<ValueObject extends zy.pointer.j2easy.framework.web.model.vo
         this.totalPages = page.getPages();
         try {
             Constructor<ValueObject> constructor = voClass.getConstructor();
-            ValueObject vo = constructor.newInstance();
             List<ValueObject> records = page.getRecords().stream().map( entity -> {
+                ValueObject vo = null;
+                try {
+                    vo = constructor.newInstance();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
                 if ( handler != null ){
                     return handler.handle( entity , vo );
                 }
