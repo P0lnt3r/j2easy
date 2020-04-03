@@ -24,4 +24,6 @@ public interface IAccountService extends BusinessService<Account> {
      */
     Account findByUsername( String username );
 
+    int checkUsernameExists( String username );
+
 }

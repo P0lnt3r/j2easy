@@ -12,11 +12,20 @@ import java.time.LocalDateTime;
 @Data
 public class AccountSaveDTO extends AbsDataTransferObject<Account> {
 
+    @ApiModelProperty( value = "主键ID")
+    private Long id;
+
     @ApiModelProperty( value = "登陆账号")
     private String username;
 
     @ApiModelProperty( value = "登陆密码")
     private String password;
+
+    @ApiModelProperty( value = "账户所属域")
+    private Integer realm;
+
+    @ApiModelProperty( value = "账户状态")
+    private Integer state;
 
     public static void main(String[] args) {
         AccountSaveDTO dto = new AccountSaveDTO();

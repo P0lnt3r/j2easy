@@ -4,6 +4,8 @@ package zy.pointer.j2easy.api.bm.system.controller;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +38,13 @@ public class AccountController {
     @Autowired
     IAccountService accountService;
 
-    @GetMapping( value = "/get" )
-    @ApiOperation( "获取Account信息" )
-    public AccountVO get( @Valid @NotEmpty @RequestParam("id") Long id ){
-        return new AccountVO().from( accountService.getById(id) , AccountVO.class , (account, vo) -> {
-            vo.setUsername("啊哈哈哈");
-            return vo;
-        } );
+    @GetMapping("/checkUsernameExists")
+    @ApiOperation("检查账户用户名是否存在")
+    @ApiImplicitParams({
+            @ApiImplicitParam( paramType="query", name="username", dataType="String", required=true, value="账户名" ),
+    })
+    public int checkUsernameExists( @NotEmpty String username ){
+        return accountService.checkUsernameExists(username);
     }
 
     @PostMapping( value = "/saveOrUpdate")
@@ -50,20 +52,15 @@ public class AccountController {
     @RequiresPermissions( value = "/backed/system/account:saveOrUpdate" )
     public AccountVO saveOrUpdate(@Valid AccountSaveDTO dto ){
         Account account = dto.convert();
-        accountService.save(account);
+        accountService.saveOrUpdate( account );
         return new AccountVO().from( account , AccountVO.class );
     }
 
-    @RequestMapping( value = "/query" )
+    @GetMapping( value = "/query" )
     @ApiOperation( "获取Account信息" )
     public PageVo<AccountVO,Account> query( @Valid AccountQueryDTO dto){
         IPage<Account> page = accountService.selectByMapForPage( dto.convert() , BeanUtil.beanToMap( dto ));
-        return new PageVo<AccountVO , Account>().from( page ,AccountVO.class , (account, vo) -> {
-            vo.setUsername("11111111111");
-            return vo;
-        });
+        return new PageVo<AccountVO , Account>().from( page ,AccountVO.class );
     }
-
-
 
 }

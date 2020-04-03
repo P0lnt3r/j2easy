@@ -2,6 +2,7 @@ package zy.pointer.j2easy.framework.business;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import zy.pointer.j2easy.framework.log.annos.LogMethod;
@@ -177,7 +178,9 @@ public abstract class AbsBusinessService<
     @Override
     @LogMethod( name = "通过条件MAP查询分页{}")
     public IPage<Entity> selectByMapForPage(Page<Entity> page, Map<String, Object> params) {
-        System.out.println("-------------------------------");
+        if ( page.getOrders().isEmpty() ){
+            page.addOrder( OrderItem.desc("_ID") );
+        }
         return getBaseMapper().selectByMapForPage( page , params );
     }
 

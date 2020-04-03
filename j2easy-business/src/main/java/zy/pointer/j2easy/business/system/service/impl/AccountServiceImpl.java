@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.annotation.Transactional;
+import sun.nio.cs.US_ASCII;
 import zy.pointer.j2easy.business.system.entity.Account;
 import zy.pointer.j2easy.business.system.mapper.AccountMapper;
 import zy.pointer.j2easy.business.system.service.IAccountService;
@@ -32,6 +33,11 @@ public class AccountServiceImpl extends AbsBusinessService<AccountMapper, Accoun
         LambdaQueryWrapper<Account> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq( Account::getUsername , username );
         return getBaseMapper().selectOne( queryWrapper );
+    }
+
+    @Override
+    public int checkUsernameExists(String username) {
+        return findByUsername(username) == null ? 0 : 1;
     }
 
     @Override
