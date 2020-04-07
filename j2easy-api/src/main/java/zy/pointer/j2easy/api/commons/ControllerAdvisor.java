@@ -14,6 +14,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import zy.pointer.j2easy.business.commons.ErrorCode;
 import zy.pointer.j2easy.framework.commons.JSONResponseHelper;
+import zy.pointer.j2easy.framework.exception.BusinessException;
 import zy.pointer.j2easy.framework.exception.RepeatRequestAccessException;
 import zy.pointer.j2easy.framework.exception.jwt.JWTExpireException;
 import zy.pointer.j2easy.framework.exception.jwt.JWTInvalidException;
@@ -96,6 +97,16 @@ public class ControllerAdvisor implements ResponseBodyAdvice {
             return jsonResponseHelper.error(ErrorCode.ERROR_CODE_1004);
         }
         return jsonResponseHelper.error(ErrorCode.ERROR_CODE_1005);
+    }
+
+    /**
+     * JWT 异常处理
+     * @param e
+     * @return
+     */
+    @ExceptionHandler( {BusinessException.class} )
+    public Object handleBusinessException( BusinessException e ){
+        return jsonResponseHelper.error( e.getCode() , e.getExtraMsg() );
     }
 
 }

@@ -11,6 +11,7 @@ public enum  ErrorCode implements IErrorCode {
     ERROR_CODE_1003( "1003" , "您的账户在其他地方登陆"),
     ERROR_CODE_1004( "1004" , "用户信息失效,请重新登陆" ),
     ERROR_CODE_1005( "1005" , "认证信息错误,请重新登陆" ),
+    ERROR_CODE_1006( "1006" , "用户密码不匹配" ),
     ERROR_CODE_1404( "1404" , "404 - 资源不存在" ),
     ERROR_CODE_1405( "1405" , "方法访问错误"),
 

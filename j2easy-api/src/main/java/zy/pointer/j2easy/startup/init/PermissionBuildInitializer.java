@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  *    下一步还有一个点就是 通过 SpringBoot 读取所有的 @RequestMapping , 将具体的接口找到,
  *    这一类的权限被定义为 功能权限
  */
-@Component
+// @Component
 @Slf4j
 public class PermissionBuildInitializer implements InitializingBean , ApplicationContextAware {
 
