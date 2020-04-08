@@ -20,6 +20,7 @@ import zy.pointer.j2easy.framework.exception.jwt.JWTExpireException;
 import zy.pointer.j2easy.framework.exception.jwt.JWTInvalidException;
 import zy.pointer.j2easy.framework.exception.jwt.JWTKickOutException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -51,11 +52,18 @@ public class ControllerAdvisor implements ResponseBodyAdvice {
      * @param e
      * @return
      */
-    @ExceptionHandler( BindException.class )
-    public Object handle( BindException e ){
-        Collection error = e.getFieldErrors().stream().map( err -> err.getField() + ":" + err.getDefaultMessage())
-                .collect(Collectors.toList());
-        return jsonResponseHelper.error(ErrorCode.ERROR_CODE_1001 , error.toString());
+    @ExceptionHandler( { BindException.class , ConstraintViolationException.class} )
+    public Object handleValid( Exception e ){
+        if ( e instanceof BindException ){
+            Collection error = ((BindException)e).getFieldErrors().stream().map( err -> err.getField() + ":" + err.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return jsonResponseHelper.error(ErrorCode.ERROR_CODE_1001 , error.toString());
+        }else if ( e instanceof ConstraintViolationException ){
+            Collection error = ((ConstraintViolationException)e).getConstraintViolations().stream().map( v -> v.getMessageTemplate() )
+                    .collect(Collectors.toList());
+            return jsonResponseHelper.error(ErrorCode.ERROR_CODE_1001 , error.toString());
+        }
+        return jsonResponseHelper.error(ErrorCode.ERROR_CODE_1001);
     }
 
     /**

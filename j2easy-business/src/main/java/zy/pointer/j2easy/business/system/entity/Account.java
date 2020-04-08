@@ -59,5 +59,4 @@ public class Account extends BaseEntity{
     @TableField("REALM")
     private Integer realm;
 
-
 }

@@ -3,15 +3,18 @@ package zy.pointer.j2easy.business.system.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.annotation.Transactional;
 import sun.nio.cs.US_ASCII;
+import zy.pointer.j2easy.business.commons.ErrorCode;
 import zy.pointer.j2easy.business.system.entity.Account;
 import zy.pointer.j2easy.business.system.mapper.AccountMapper;
 import zy.pointer.j2easy.business.system.service.IAccountService;
 import zy.pointer.j2easy.framework.business.AbsBusinessService;
 import org.springframework.stereotype.Service;
+import zy.pointer.j2easy.framework.exception.BusinessException;
 import zy.pointer.j2easy.framework.log.annos.LogMethod;
 
 /**
@@ -41,23 +44,41 @@ public class AccountServiceImpl extends AbsBusinessService<AccountMapper, Accoun
     }
 
     @Override
-    public int createAccount(String username, String password, Integer realm) {
-        // 随机得出一个 8 字符长度的盐值.
-        String salt = RandomUtil.randomNumbers(8);
-        MD5 md5 = MD5.create();
-        String md5_password = md5.digestHex( password );
-        password = md5.digestHex( md5_password + salt  );
-        Account account = new Account();
-        account.setUsername( username );
-        account.setPassword( password );
-        account.setSalt( salt );
-        return getBaseMapper().insert( account );
+    public boolean saveOrUpdate(Account entity) {
+        String password = entity.getPassword();
+        if ( entity.getId() == null ){
+            String salt = RandomUtil.randomNumbers(8);
+            password = md5Password(password , salt);
+            entity.setPassword(password);
+            entity.setSalt(salt);
+        }else{
+            Account _account = findByUsername( entity.getUsername() );
+            String salt = _account.getSalt();
+            password = md5Password(password , salt);
+            entity.setPassword(password);
+        }
+        return super.saveOrUpdate(entity);
     }
 
     @Override
-    public int login(String username, String password, Integer realm) {
+    public Account login(String username, String password, Integer realm) {
+        LambdaQueryWrapper<Account> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq( Account::getUsername , username );
+        Account account = getBaseMapper().selectOne( queryWrapper );
+        // TODO : 针对用户的状态以及相关的一些设置,可以具体做一些逻辑
+        if ( account == null ){
+            throw new BusinessException(ErrorCode.ERROR_CODE_1006);
+        }
+        String _password = account.getPassword();
+        if ( ! _password.equals( md5Password( password , account.getSalt() ) ) ){
+            throw new BusinessException(ErrorCode.ERROR_CODE_1006);
+        }
+        return account;
+    }
 
-        return 0;
+    private String md5Password( String password , String salt ){
+        MD5 md5 = MD5.create();
+        return md5.digestHex( md5.digestHex(password) + salt );
     }
 
     public static void main(String[] args) {

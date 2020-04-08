@@ -31,7 +31,7 @@ import javax.validation.constraints.NotEmpty;
  * @since 2020-01-15
  */
 @RestController
-@RequestMapping("/system/account")
+@RequestMapping("/api/bm/system/account")
 @Api( "账户管理" )
 public class AccountController {
 

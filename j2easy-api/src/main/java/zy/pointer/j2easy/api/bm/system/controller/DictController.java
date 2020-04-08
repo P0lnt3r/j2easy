@@ -28,7 +28,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @RestController
-@RequestMapping("/system/dict")
+@RequestMapping("/api/bm/system/dict")
 @Api( "字典管理" )
 public class DictController {
 

@@ -25,10 +25,10 @@ import java.util.stream.Stream;
 public class PermissionServiceImpl extends AbsBusinessService<PermissionMapper , Permission> implements IPermissionService {
 
     public static final String[] DEFAULT_PERMISSION_MENU = {
-            "/" ,       // root
-            "/bm",      // 后台管理接口
-            "/apps",    // 应用服务接口
-            "/public"   // 公共接口服务
+            "/api" ,        // root
+            "/api/bm",      // 后台管理接口
+            "/api/apps",    // 应用服务接口
+            "/api/public"   // 公共接口服务
     };
 
     private Permission root;
