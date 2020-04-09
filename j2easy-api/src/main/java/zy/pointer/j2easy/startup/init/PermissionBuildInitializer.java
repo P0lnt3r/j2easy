@@ -1,5 +1,8 @@
 package zy.pointer.j2easy.startup.init;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
+import cn.hutool.json.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -9,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import zy.pointer.j2easy.business.system.entity.Permission;
 import zy.pointer.j2easy.business.system.service.IPermissionService;
+import zy.pointer.j2easy.framework.datastructuers.pathtree.PathTree;
+import zy.pointer.j2easy.framework.datastructuers.pathtree.PathTreeNode;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -76,6 +82,8 @@ public class PermissionBuildInitializer implements InitializingBean , Applicatio
     @Override
     public void afterPropertiesSet() throws Exception {
 
+        permissionService.initRealmsPermission();
+
         // Base - Api : zy.pointer.j2easy.api
         // Realm      : bm(后台管理) , apps(应用服务) , public(公共接口)
         // Fixed PackageName : controller , Fixed Suffix : Controller : {entity}Controller (xxxController)
@@ -87,108 +95,98 @@ public class PermissionBuildInitializer implements InitializingBean , Applicatio
         RequestMappingHandlerMapping mapping = applicationContext.getBean(RequestMappingHandlerMapping.class);
         Map<RequestMappingInfo, HandlerMethod> map = mapping.getHandlerMethods();
 
-        // 在构建菜单级别的权限的时候,每拿到一个 @RequestMapping 都有可能重复得到它对应的 包结构,所有这里用Set , 并重写了 Permission 的 equals 方法
-        Set<Permission> menuPermissionSet = new HashSet<>();
+        final PathTree<Permission> dbTree = new PathTree<>();
+        permissionService.list().forEach( permission -> dbTree.put( new PathTreeNode( permission.getPath() , permission.getName() , permission ) ) );
 
-        // 遍历所有的 RequestMapping , 过滤出 功能性的菜单,并在过滤的过程中,构建叶子级别菜单
-        Set<Permission> funcPermissionSet = map.entrySet().stream()
-                // 过滤只有我们定义下的包才进行权限结构构建,以防其他库进来瞎搞
+        PathTree<Permission> memTree = new PathTree<>();
+
+        // 遍历所有的 RequestMapping , 过滤出 功能性的菜单,并在过滤的过程中,将数据拼入到 memTree 结构中
+        map.entrySet().stream()
+                // 过滤只有我们定义下的包才进行权限结构构建,以防止其他包混进来瞎搞
                 .filter( entry -> entry.getValue().getBeanType().getName().startsWith( basePath ))
-                .map(entry -> {
+                .forEach(entry -> {
 
             HandlerMethod handlerMethod = entry.getValue();
             Class  controllerClazz = handlerMethod.getBeanType();
             Method method = handlerMethod.getMethod();
+
+            // 关于它的父节点 : zy.pointer.j2easy.api.bm.system.controller.AccountController
             String className = controllerClazz.getName();
-            // zy.pointer.j2easy.api.bm.system.controller.AccountController
-            // 取 _basePath_        .{realm}.{modules}.controller.{entity}Controller
-            String realm_modules_FIX_PACKAGE_Entity_SuffixController = className.substring( basePath.length() + 1);
-            String[] array = realm_modules_FIX_PACKAGE_Entity_SuffixController.split("\\.");
-            String realm = array[0];
-            String entityController = array [ array.length - 1 ];
+            /*
+             * zy.pointer.j2easy.api.bm.system.controller.AccountController
+             * _basePath_.{realm}.{modules}.controller.{entity}Controller
+             *
+             * eg1:
+             *  value: api.bm.system.account
+             *  path: /api/bm/system/account
+             *
+             * 解析逻辑:先去掉头,尾 取出 {realm}.{modules}.controller
+             *          如果这个截取值中以 controller 结尾 , 则 去掉 controller 变成 {realm}.{modules}
+             * 然后处理第一截取的 AccountController , 取出 entity -> Account 然后转小写 account
+             */
+            // --> bm.system.controller.AccountController
+            String realm_modules_CONTROLLER_entityController = className.substring( basePath.length() + 1 );
+            String entityController = realm_modules_CONTROLLER_entityController.substring( realm_modules_CONTROLLER_entityController.lastIndexOf(".") + 1 );
+            String realm_modules_CONTROLLER = realm_modules_CONTROLLER_entityController.substring( 0 , realm_modules_CONTROLLER_entityController.length() - entityController.length() - 1 );
             String entity = entityController.replace( FIXED_CONTROLLER_SUFFIX , "" );
             // 注意 Entity 类中的首字母转一下小写
             entity = entity.substring( 0 , 1 ).toLowerCase() + entity.substring(1);
-            String packages = realm_modules_FIX_PACKAGE_Entity_SuffixController.substring(
-                     realm.length() + 1
-                    ,realm_modules_FIX_PACKAGE_Entity_SuffixController.length() - ( FIXED_CONTROLLER_SUFFIX + "." + entityController ).length() - 1
-            );
-            // 包级别的为 叶结构菜单 , 包级别 + Entity 构成 叶结构末端菜单
-            /*
-             * 比如一个 zy.pointer.j2easy.api.bm.system.controller.AccountController.query()
-             * bm(realm) : 后台管理
-             *  system:    系统设置      叶结构菜单权限          bm.system
-             *    Account: 用户管理      叶结构菜单末端权限      bm.system.Account
-             *      query: 用户信息查询  功能权限               bm.system.Account:query
-             *
-             *    asset  : 资产管理      叶结构菜单权限         bm.system.asset
-             *      Deposit: 充值管理    末端权限               bm.system.asset.Deposit
-             *        get  : 充值记录查询                       bm.system.asset.Deposit:get
-             */
-            String[] packageArr = packages.split("\\.");
-            if ( packageArr.length > 1 ){
-                for( int i = 0 ;i<packageArr.length ;i++ ){
-                    String value = "";
-                    for( int j = 0 ; j<i;j++ ){
-                        value += packageArr[ j ] + ".";
-                    }
-                    value += packageArr[i];
-                    menuPermissionSet.add( permissionService.wrapByValue( realm + "." + value , value ) );
-                }
+            String realm_modules = realm_modules_CONTROLLER;
+            if ( realm_modules_CONTROLLER.contains(FIXED_PACKAGE_NAME) ){
+                realm_modules = realm_modules_CONTROLLER.substring( 0 , realm_modules_CONTROLLER.length() - FIXED_PACKAGE_NAME.length() - 1 );
+            }
+            String parentValue = "api." + realm_modules;
+            Permission parentPermission = null;
+            if ( realm_modules.contains(".") ){   // 说明存在 modules 而不是直接建立在 bm 包下的直系 Controller
+                parentValue = "api." + realm_modules + "." + entity;
+                String parentPath  = "/" + parentValue.replaceAll("\\." , "/");
+                String parentName = entity;
+                Api api = controllerClazz.getDeclaredAnnotation( Api.class ) == null ? null : (Api)  controllerClazz.getDeclaredAnnotation( Api.class );
+                parentName = api.value() != null ? api.value() : parentName;
+                parentPermission = permissionService.buildMenuTypePermission( parentPath , parentName );
             }else{
-                menuPermissionSet.add( permissionService.wrapByValue( realm + "." + packages , packages ) );
+                String parentPath  = "/" + parentValue.replaceAll("\\." , "/");
+                parentPermission = (Permission) dbTree.get( parentPath ).getPayload();
             }
-            // 末端菜单
-            /*
-               末端菜单的名称由 Controller 中的 Swagger2.@Api 注解来获取
-             */
-            String value = realm + "." + packages + "." + entity;
-            Api api = ( Api ) controllerClazz.getDeclaredAnnotation( Api.class );
-            String name = entity.toUpperCase();
-            if ( api != null ){
-                name = api.value();
-            }
-            Permission packageEndPermission = permissionService.wrapByValue(value , name);
-            menuPermissionSet.add( packageEndPermission );
-            // 当前功能菜单
-            /*
-               功能菜单的名称由 对应方法上的 Swagger2.@ApiOperation 注解来获取
-             */
-            String funcPermissionValue = realm + "." + packages + "." + entity + ":" + method.getName();
-            String funcPermissionName  = method.getName();
+
+            String methodName = method.getName();
+            String path = parentPermission.getPath() + "/" + methodName;
             ApiOperation apiOperation = method.getDeclaredAnnotation( ApiOperation.class );
-            if ( apiOperation != null ){
-                funcPermissionName = apiOperation.value();
+            String name = apiOperation != null ? apiOperation.value() : methodName;
+            Permission permission = permissionService.buildFuncTypePermission(path , name);
+
+            memTree.put( new PathTreeNode( parentPermission.getPath() , parentPermission.getName() , parentPermission ) );
+            memTree.put( new PathTreeNode( permission.getPath() , permission.getName() , permission ) );
+        } );
+
+
+
+        PathTreeNode parent = memTree.getRoot();
+        parent.foreachHandle( ( pathTreeNode )->{
+            String path = pathTreeNode.getPath();
+            if ( dbTree.get( path ) == null ){
+                String parentPath = path.substring(0 , path.lastIndexOf("/"));
+
+                // 首先从 DB-TREE 中尝试找父节点,如果父节点存在,则直接去 id 作为当前要添加的Permission的PID来使用
+                Permission parentPermission = (Permission) dbTree.get( parentPath ).getPayload();
+                if ( parentPermission == null ){
+                    // 如果不存在,则从 MEM-TREE 中找.
+                    parentPermission = (Permission) memTree.get( parentPath ).getPayload();
+                }
+                // 以上,不用担心找不到的原因是因为,我们从设计上是从上外内遍历的,所以任何一个权限的父节点要么在DB中存在,要么在上一级递归中存储到了MEM-TREE中去了.
+                Permission permission = null;
+                if ( pathTreeNode.getPayload() == null ){
+                    /** 从 MEM-TREE 中发现 pathTreeNode 没有挂载 payload , 则它就一定是一个通过包路径模拟出来的虚拟节点 */
+                    permission = permissionService.buildMenuTypePermission( pathTreeNode.getPath() , pathTreeNode.getPath() );
+                }else{
+                    permission = (Permission) pathTreeNode.getPayload();
+                }
+                permission.setPId( parentPermission.getId() );
+                permissionService.save( permission );
+                pathTreeNode.setPayload( permission );
+
             }
-            return permissionService.wrapByValue( funcPermissionValue , funcPermissionName );
-
-        } ).collect( Collectors.toSet() );
-
-        // 构建 菜单权限表中 root , /bm , /public , /app 四个的DB初始化,并加载到 root 中.
-        permissionService.initRealmsPermission();
-
-        /*
-         */
-        List<Permission> allDbMenuPermissionList = permissionService.getAllMenuPermissions();
-        List<Permission> allDbFuncPermissionList = permissionService.getAllFuncPermissions();
-        List<Permission> newMenuPermissionList = menuPermissionSet
-                .stream()
-                .filter( perm -> ! allDbMenuPermissionList.contains(perm) )
-                .sorted( Comparator.comparing( Permission::getLevel ) )
-                .collect(Collectors.toList());
-        List<Permission> newFuncPermissionList = funcPermissionSet
-                .stream()
-                .filter( perm -> ! allDbFuncPermissionList.contains(perm) )
-                .sorted( Comparator.comparing( Permission::getLevel ) )
-                .collect(Collectors.toList());
-
-        allDbMenuPermissionList.forEach( permissionService::add );
-        allDbFuncPermissionList.forEach( permissionService::add );
-        newMenuPermissionList.forEach( permissionService::addNew );
-        newFuncPermissionList.forEach( permissionService::addNew );
-
+        });
     }
-
-
 
 }

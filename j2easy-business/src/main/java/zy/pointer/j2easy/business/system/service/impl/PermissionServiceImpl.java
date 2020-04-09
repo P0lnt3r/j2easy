@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 public class PermissionServiceImpl extends AbsBusinessService<PermissionMapper , Permission> implements IPermissionService {
 
     public static final String[] DEFAULT_PERMISSION_MENU = {
-            "/api" ,        // root
+            "/" ,           // root
             "/api/bm",      // 后台管理接口
             "/api/apps",    // 应用服务接口
             "/api/public"   // 公共接口服务
@@ -34,45 +34,66 @@ public class PermissionServiceImpl extends AbsBusinessService<PermissionMapper ,
     private Permission root;
 
     @Override
-    public Permission getRoot() {
-        return root;
-    }
+    public Permission buildFuncTypePermission(String path, String name) {
 
-    /**
-     * 将 Value 包装为 Permission , 主要针对 2级 级别菜单封装
-     * @param value
-     * @param name
-     * @return
-     */
-    @Override
-    public Permission wrapByValue(String value , String name) {
         Permission permission = new Permission();
-        permission.setValue( value );
-        permission.setName( name );
-        String path = "/" + value.replaceAll("\\." , "/" );
         permission.setPath( path );
-        int level = path.split("/").length;
-        if ( value.contains(":") ){
-            permission.setLevel( level );
-            permission.setPath( path.replaceAll(":" , "/") );
-            permission.setType( Convert.toInt( DictConstant.SYSTEM_PERMISSION_TYPE_FUNC.value )  );
-        }else{
-            permission.setLevel( level - 1);
-            permission.setType( Convert.toInt( DictConstant.SYSTEM_PERMISSION_TYPE_MENU.value ) );
+        /*
+         * path : /api/bm/system/account/query
+         * value: api.bm.system.account:query
+         */
+        String[] tempArr = path.substring(0).split("/");
+        String value = "";
+        for (int i = 1; i < tempArr.length; i++) {
+            if ( i == tempArr.length - 1 ){
+                value = value.substring(0,value.length()-1) + ":" + tempArr[i] ;
+                break;
+            }
+            value = value + tempArr[i] + "." ;
         }
+        permission.setValue( value );
+        permission.setName ( name );
+        permission.setLevel( path.split("/").length );
+        permission.setType ( Convert.toInt( DictConstant.SYSTEM_PERMISSION_TYPE_FUNC.value )  );
         permission.setState( Convert.toInt( DictConstant.SYSTEM_PERMISSION_STATE_ACTIVE.value ) );
         return permission;
     }
 
     @Override
+    public Permission buildMenuTypePermission(String path, String name) {
+        Permission permission = new Permission();
+        permission.setPath( path );
+        /*
+         * path : /api/bm/system/account
+         * value: api.bm.system.account
+         */
+        String value = path.substring(1).replaceAll( "/" , "\\." );
+        permission.setValue( value);
+        permission.setName (  name);
+        permission.setLevel( path.split("/").length );
+        permission.setType (  Convert.toInt( DictConstant.SYSTEM_PERMISSION_TYPE_MENU.value )  );
+        permission.setState( Convert.toInt( DictConstant.SYSTEM_PERMISSION_STATE_ACTIVE.value ) );
+        return permission;
+    }
+
+    @Override
+    public Permission getRoot() {
+        return root;
+    }
+
+    @Override
     @LogMethod( name = "初始化权限Realms" , logOut = false )
     public void initRealmsPermission() {
+
         LambdaQueryWrapper<Permission> wrapper = Wrappers.lambdaQuery( new Permission() )
                 .in( Permission::getPath , DEFAULT_PERMISSION_MENU );
         List<Permission> permissionList = list(wrapper);
+
+        // 查询
         Set<String> dbPaths = permissionList.stream().map( Permission::getPath ).collect(Collectors.toSet());
         Set<String> paths = Stream.of( DEFAULT_PERMISSION_MENU ).collect(Collectors.toSet());
         Set<String> unBuildPaths = paths.stream().filter( path -> !dbPaths.contains(path) ).collect(Collectors.toSet());
+
         if ( unBuildPaths.contains("/") ){
             // 构建 ROOT - Permission
             root = new Permission();
@@ -87,20 +108,20 @@ public class PermissionServiceImpl extends AbsBusinessService<PermissionMapper ,
             root = permissionList.stream().filter( permission -> permission.getPath().equals("/") ).findFirst().get();
         }
         List<Permission> realmPermissionList = new ArrayList<>();
-        if (  unBuildPaths.contains("/bm") ){
-            realmPermissionList.add (saveRealm( "bm" , "/bm" , "后台管理" , root.getId() ));
+        if (  unBuildPaths.contains("/api/bm") ){
+            realmPermissionList.add (saveRealm( "api.bm" , "/api/bm" , "后台管理" , root.getId() ));
         }else{
-            realmPermissionList.add(permissionList.stream().filter( permission -> "/bm".equals( permission.getPath() ) ).findFirst().get());
+            realmPermissionList.add(permissionList.stream().filter( permission -> "/api/bm".equals( permission.getPath() ) ).findFirst().get());
         }
-        if (  unBuildPaths.contains("/apps") ){
-            realmPermissionList.add (saveRealm( "apps" , "/apps" , "应用服务" , root.getId() ));
+        if (  unBuildPaths.contains("/api/apps") ){
+            realmPermissionList.add (saveRealm( "api.apps" , "/api/apps" , "应用服务" , root.getId() ));
         }else{
-            realmPermissionList.add(permissionList.stream().filter( permission -> "/apps".equals( permission.getPath() ) ).findFirst().get());
+            realmPermissionList.add(permissionList.stream().filter( permission -> "/api/apps".equals( permission.getPath() ) ).findFirst().get());
         }
-        if (  unBuildPaths.contains("/public") ){
-            realmPermissionList.add (saveRealm( "public" , "/public" , "公共服务" , root.getId() ) );
+        if (  unBuildPaths.contains("/api/public") ){
+            realmPermissionList.add (saveRealm( "api.public" , "/api/public" , "公共服务" , root.getId() ) );
         }else {
-            realmPermissionList.add(permissionList.stream().filter( permission -> "/public".equals( permission.getPath() ) ).findFirst().get());
+            realmPermissionList.add(permissionList.stream().filter( permission -> "/api/public".equals( permission.getPath() ) ).findFirst().get());
         }
         root.setChildrenList( realmPermissionList );
     }
@@ -131,7 +152,6 @@ public class PermissionServiceImpl extends AbsBusinessService<PermissionMapper ,
     public List<Permission> getAllMenuPermissions() {
         LambdaQueryWrapper<Permission> wrapper = Wrappers.lambdaQuery( new Permission() )
                 .eq( Permission::getType , DictConstant.SYSTEM_PERMISSION_TYPE_MENU.value() )
-                .gt( Permission::getLevel , 1 )
                 .orderByAsc( Permission::getLevel );    // 通过 LEVEL 进行正序排序
         return list(wrapper);
     }
@@ -144,74 +164,5 @@ public class PermissionServiceImpl extends AbsBusinessService<PermissionMapper ,
                 .orderByAsc( Permission::getLevel );
         return list(wrapper);
     }
-
-    public void add(Permission permission ){
-        String path = permission.getPath();
-        String parentPath = path.substring( 0 ,path.lastIndexOf("/") );
-        Permission parent = find(parentPath);
-        if ( parent.getChildrenList() == null ){
-            parent.setChildrenList( new ArrayList<>() );
-        }
-        parent.getChildrenList().add( permission );
-    }
-
-    public void addNew( Permission permission ){
-        String path = permission.getPath();
-        String parentPath = path.substring( 0 ,path.lastIndexOf("/") );
-        Permission parent = find(parentPath);
-        permission.setPId( parent.getId() );
-        save(permission);
-        if ( parent.getChildrenList() == null ){
-            parent.setChildrenList( new ArrayList<>() );
-        }
-        parent.getChildrenList().add( permission );
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Permission find( String path ){
-        // /bm/system/asset/Account
-        /*
-         *  将其拆分为如下数组结构,一层一层得向下解析寻找
-            /
-         *  /bm
-         *  /bm/system
-         *  /bm/system/Account
-         */
-        String[] arr = path.split("/");
-        String[] target = new String[ arr.length ];
-        for( int i = 0; i<arr.length; i++ ){
-            String _value = "";
-            for( int j = 0;j<i;j++ ){
-                _value = _value + arr[j] + "/";
-            }
-            target[i] = _value + arr[i];
-        }
-        target[0] = "/";
-        Permission result = null;
-        for( int i = 0;i<target.length;i++ ){
-            /*
-                 第一次调用 : root , / => root
-                 第二次调用 : root , /bm => bm
-                 第三次调用 : bm   , /bm/system => system
-                 第四次调用 : system,/bm/system/Account => Account
-             */
-            result = find( result == null ? root : result , target[i] );
-        }
-        return result;
-    }
-
-    public Permission find( Permission cursor , String path ){
-        if ( cursor.getPath().equals( path ) ){
-            return cursor;
-        }
-        return cursor.getChildrenList()
-                .stream()
-                .filter( perm -> path.equals( perm.getPath() ) )
-                .findFirst().get();
-    }
-
 
 }

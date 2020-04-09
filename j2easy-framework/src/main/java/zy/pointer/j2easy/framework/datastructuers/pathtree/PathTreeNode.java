@@ -12,6 +12,14 @@ import java.util.stream.Collectors;
  */
 public class PathTreeNode <T> implements Serializable {
 
+    public void foreachHandle( PathTreeNodeEachHandler handler ){
+        handler.handle(this);
+        if ( this.getChildren() != null && !this.getChildren().isEmpty() ){
+            this.getChildren().forEach( node -> node.foreachHandle(handler) );
+        }
+    }
+
+
     public <Obj extends SelfRefChildrenListObject> Obj convert(Class<Obj> clazz , PathTreeNodeConvertHandler<Obj> handler ) throws IllegalAccessException, InstantiationException {
         Obj obj = handler.convert( this , clazz.newInstance() );
         if ( this.getChildren() != null && !this.getChildren().isEmpty() ){

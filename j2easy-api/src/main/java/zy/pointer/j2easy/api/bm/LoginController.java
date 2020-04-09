@@ -15,13 +15,12 @@ import zy.pointer.j2easy.business.system.service.IAccountService;
 import zy.pointer.j2easy.endecrypt.RSA;
 import zy.pointer.j2easy.framework.auth.components.JWT;
 import zy.pointer.j2easy.framework.auth.jwt.JWTModel;
-import zy.pointer.j2easy.framework.endecrypt.RSAUtils;
 import zy.pointer.j2easy.framework.exception.BusinessException;
 
 import javax.validation.constraints.NotEmpty;
 
 @RestController
-@Api("后台登录接口")
+@Api("后台管理")
 @RequestMapping("/api/bm")
 @Validated
 public class LoginController {
@@ -49,7 +48,6 @@ public class LoginController {
         JSONObject json = new JSONObject();
         String _ = jwt.issue(new JWTModel( account.getId() + "" , "realm:bm" , 120 ));
         json.put("jwt",_);
-
         return json;
     }
 

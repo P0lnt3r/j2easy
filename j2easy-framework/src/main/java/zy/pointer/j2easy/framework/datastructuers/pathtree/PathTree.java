@@ -40,7 +40,10 @@ public class PathTree <T> implements Serializable {
 
     }
 
-    public PathTreeNode get( String path ){
+    public PathTreeNode<T> get( String path ){
+        if ( "/".equals(path) ){
+            return root;
+        }
         PathTreeNode parent = getParent( path );
         return getPathTreeNode( parent , path );
     }
