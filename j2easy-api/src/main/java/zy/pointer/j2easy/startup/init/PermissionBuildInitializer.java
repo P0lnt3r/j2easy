@@ -142,7 +142,7 @@ public class PermissionBuildInitializer implements InitializingBean , Applicatio
                 String parentPath  = "/" + parentValue.replaceAll("\\." , "/");
                 String parentName = entity;
                 Api api = controllerClazz.getDeclaredAnnotation( Api.class ) == null ? null : (Api)  controllerClazz.getDeclaredAnnotation( Api.class );
-                parentName = api.value() != null ? api.value() : parentName;
+                parentName = api != null ? api.value() : parentName;
                 parentPermission = permissionService.buildMenuTypePermission( parentPath , parentName );
             }else{
                 String parentPath  = "/" + parentValue.replaceAll("\\." , "/");

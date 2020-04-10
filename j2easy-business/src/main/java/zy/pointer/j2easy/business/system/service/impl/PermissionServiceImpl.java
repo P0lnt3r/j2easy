@@ -165,4 +165,17 @@ public class PermissionServiceImpl extends AbsBusinessService<PermissionMapper ,
         return list(wrapper);
     }
 
+    @Override
+    public List<Permission> getRealms() {
+        String[] REALM = {
+                DEFAULT_PERMISSION_MENU[1] ,    // /api/bm
+                DEFAULT_PERMISSION_MENU[2] ,    /* /api/apps */
+                DEFAULT_PERMISSION_MENU[3] ,    /* /api/public */
+
+        };
+        LambdaQueryWrapper<Permission> wrapper = Wrappers.lambdaQuery( new Permission() )
+                .in( Permission::getPath , REALM  );
+        List<Permission> permissionList = list(wrapper);
+        return permissionList;
+    }
 }

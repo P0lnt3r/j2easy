@@ -11,6 +11,8 @@ public interface IPermissionService extends BusinessService<Permission> {
 
     Permission buildMenuTypePermission( String path , String name );
 
+    List<Permission> getRealms();
+
     /**
      * 获取 ROOT - Permission
      * @return
