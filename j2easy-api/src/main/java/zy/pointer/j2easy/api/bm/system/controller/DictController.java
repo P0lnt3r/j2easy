@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import zy.pointer.j2easy.api.bm.system.dto.DictQueryDTO;
 import zy.pointer.j2easy.api.bm.system.dto.DictSaveDTO;
-import zy.pointer.j2easy.api.bm.system.vo.DictVo;
-import zy.pointer.j2easy.api.bm.system.vo.TreeDictVo;
+import zy.pointer.j2easy.api.bm.system.vo.DictVO;
+import zy.pointer.j2easy.api.bm.system.vo.TreeNodeDictVO;
 import zy.pointer.j2easy.business.system.entity.Dict;
 import zy.pointer.j2easy.business.system.service.IDictService;
 import zy.pointer.j2easy.framework.datastructuers.pathtree.PathTree;
@@ -37,18 +37,17 @@ public class DictController {
 
     @GetMapping("/catalog")
     @ApiOperation( "获取字典目录结构树" )
-    public List<TreeDictVo> getDictCatalog() throws InstantiationException, IllegalAccessException {
+    public List<TreeNodeDictVO> getDictCatalog() throws InstantiationException, IllegalAccessException {
         LambdaQueryWrapper<Dict> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq( Dict::getType , "2" /* 字典目录类型 */ );
         List<Dict> dictList = dictService.list( queryWrapper );
         PathTree<Dict> tree = new PathTree<>();
         dictList.forEach( dict -> tree.put( new PathTreeNode<Dict>( dict.getPath() , dict.getName() , dict )) );
-        TreeDictVo root = tree.getRoot().convert( TreeDictVo.class , (pathTreeNode , dictVo ) -> {
+        TreeNodeDictVO root = tree.getRoot().convert( TreeNodeDictVO.class , ( pathTreeNode , dictVo ) -> {
             Dict dict = (Dict) pathTreeNode.getPayload();
+            dictVo.setPayload( new DictVO().from( dict , DictVO.class ) );
             dictVo.setTitle( dict.getName() );
             dictVo.setKey( dict.getUniq() );
-            dictVo.setId( dict.getId() );
-            dictVo.setUniq( dict.getUniq() );
             return dictVo;
         } );
         return root.getChildren();
@@ -56,13 +55,13 @@ public class DictController {
 
     @GetMapping("/query")
     @ApiOperation( "分页查询字典" )
-    public PageVo<DictVo , Dict> query( @Valid DictQueryDTO dto){
+    public PageVo<DictVO, Dict> query(@Valid DictQueryDTO dto){
         IPage<Dict> iPage = dictService.selectByMapForPage( dto.convert()  , BeanUtil.beanToMap( dto ));
-        return new PageVo().from( iPage , DictVo.class );
+        return new PageVo().from( iPage , DictVO.class );
     }
 
     @PostMapping("/saveOrUpdate")
-    @ApiOperation( "保存|更新 字典" )
+    @ApiOperation( "保存|更新字典" )
     public boolean saveOrUpdate(@Valid DictSaveDTO dto){
         Dict dict = dto.convert();
         dict.setPath( "/" + dict.getUniq().replaceAll("\\." , "/") );

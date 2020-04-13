@@ -15,12 +15,17 @@ import org.springframework.web.bind.annotation.*;
 import zy.pointer.j2easy.api.bm.system.dto.AccountQueryDTO;
 import zy.pointer.j2easy.api.bm.system.dto.AccountSaveDTO;
 import zy.pointer.j2easy.api.bm.system.vo.AccountVO;
+import zy.pointer.j2easy.api.bm.system.vo.RoleVO;
 import zy.pointer.j2easy.business.system.entity.Account;
+import zy.pointer.j2easy.business.system.entity.Role;
 import zy.pointer.j2easy.business.system.service.IAccountService;
+import zy.pointer.j2easy.business.system.service.IRoleService;
 import zy.pointer.j2easy.framework.web.model.vo.PageVo;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -37,6 +42,9 @@ public class AccountController {
 
     @Autowired
     IAccountService accountService;
+
+    @Autowired
+    IRoleService roleService;
 
     @GetMapping("/checkUsernameExists")
     @ApiOperation("检查账户用户名是否存在")
@@ -61,6 +69,19 @@ public class AccountController {
     public PageVo<AccountVO,Account> query( @Valid AccountQueryDTO dto){
         IPage<Account> page = accountService.selectByMapForPage( dto.convert() , BeanUtil.beanToMap( dto ));
         return new PageVo<AccountVO , Account>().from( page ,AccountVO.class );
+    }
+
+    @GetMapping( value = "getAssignedRoleList" )
+    @ApiOperation("获取账户分配的角色")
+    @ApiImplicitParams({
+            @ApiImplicitParam( paramType="query", name="id", dataType="Long", required=true, value="用户ID" )
+    })
+    public List<RoleVO> getAssignedRoleList(@NotEmpty Long id ){
+        return accountService.getRoleList( id ).stream().map( role -> {
+            RoleVO roleVO = new RoleVO();
+            roleVO.from( role , Role.class );
+            return roleVO;
+        } ).collect( Collectors.toList() );
     }
 
 }

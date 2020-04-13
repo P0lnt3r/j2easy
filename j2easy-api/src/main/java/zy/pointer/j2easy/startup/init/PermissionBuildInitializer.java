@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
  *    3.> 从 PathTree-MEM 的上级开始遍历,找出 PathTree-DB 中不存在的节点,按顺序添加到一个List中.
  *    4.> 遍历 List , 从 PathTree-DB 中访问 对应的父节点获取对应的ID 作为当前节点的 P_ID,插入到数据库,并将其更新到 PathTree-DB 中
  */
-@Component
+ @Component
 @Slf4j
 public class PermissionBuildInitializer implements InitializingBean , ApplicationContextAware {
 

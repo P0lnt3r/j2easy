@@ -5,17 +5,23 @@ import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.annotation.Transactional;
 import sun.nio.cs.US_ASCII;
 import zy.pointer.j2easy.business.commons.ErrorCode;
 import zy.pointer.j2easy.business.system.entity.Account;
+import zy.pointer.j2easy.business.system.entity.Role;
 import zy.pointer.j2easy.business.system.mapper.AccountMapper;
+import zy.pointer.j2easy.business.system.mapper.RoleMapper;
 import zy.pointer.j2easy.business.system.service.IAccountService;
+import zy.pointer.j2easy.business.system.service.IRoleService;
 import zy.pointer.j2easy.framework.business.AbsBusinessService;
 import org.springframework.stereotype.Service;
 import zy.pointer.j2easy.framework.exception.BusinessException;
 import zy.pointer.j2easy.framework.log.annos.LogMethod;
+
+import java.util.List;
 
 /**
  * <p>
@@ -29,6 +35,9 @@ import zy.pointer.j2easy.framework.log.annos.LogMethod;
 @Primary
 @Transactional
 public class AccountServiceImpl extends AbsBusinessService<AccountMapper, Account> implements IAccountService {
+
+    @Autowired
+    RoleMapper roleMapper;
 
     @Override
     @Transactional( readOnly = true )
@@ -79,6 +88,11 @@ public class AccountServiceImpl extends AbsBusinessService<AccountMapper, Accoun
     private String md5Password( String password , String salt ){
         MD5 md5 = MD5.create();
         return md5.digestHex( md5.digestHex(password) + salt );
+    }
+
+    @Override
+    public List<Role> getRoleList(Long id) {
+        return roleMapper.selectAccountRoleList( id );
     }
 
     public static void main(String[] args) {

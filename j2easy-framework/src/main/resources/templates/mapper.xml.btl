@@ -29,6 +29,7 @@
     </sql>
 <% } %>
 
+
 <select id="selectByMapForPage" resultMap="BaseResultMap">
 		SELECT <include refid="Base_Column_List" /> FROM ${table.name} WHERE _DB_STATE = 1
 		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>

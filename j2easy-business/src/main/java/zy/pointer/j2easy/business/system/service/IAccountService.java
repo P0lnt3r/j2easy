@@ -1,7 +1,10 @@
 package zy.pointer.j2easy.business.system.service;
 
 import zy.pointer.j2easy.business.system.entity.Account;
+import zy.pointer.j2easy.business.system.entity.Role;
 import zy.pointer.j2easy.framework.business.BusinessService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -23,5 +26,7 @@ public interface IAccountService extends BusinessService<Account> {
     Account findByUsername( String username );
 
     int checkUsernameExists( String username );
+
+    List<Role> getRoleList( Long id );
 
 }

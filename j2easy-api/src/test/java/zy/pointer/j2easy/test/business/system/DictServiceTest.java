@@ -6,8 +6,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import zy.pointer.j2easy.api.bm.system.vo.DictVo;
-import zy.pointer.j2easy.api.bm.system.vo.TreeDictVo;
+import zy.pointer.j2easy.api.bm.system.vo.DictVO;
+import zy.pointer.j2easy.api.bm.system.vo.TreeNodeDictVO;
 import zy.pointer.j2easy.business.system.entity.Dict;
 import zy.pointer.j2easy.business.system.service.IDictService;
 import zy.pointer.j2easy.framework.datastructuers.pathtree.PathTree;
@@ -31,7 +31,7 @@ public class DictServiceTest extends SpringTestCase {
         ObjectMapper mapper = new ObjectMapper();
         System.out.println( mapper.writeValueAsString(tree) );
 
-        TreeDictVo newRoot = tree.getRoot().convert(TreeDictVo.class , (pathTreeNode , dictVo ) -> {
+        TreeNodeDictVO newRoot = tree.getRoot().convert(TreeNodeDictVO.class , (pathTreeNode , dictVo ) -> {
             Dict dict = (Dict)pathTreeNode.getPayload();
             dictVo.setKey( dict.getUniq() );
             dictVo.setTitle( dict.getName() );
@@ -50,7 +50,7 @@ public class DictServiceTest extends SpringTestCase {
         IPage<Dict> _page =  dictService.selectByMapForPage(page , params);
 
         PageVo pageVo = new PageVo();
-        pageVo = pageVo.from( _page , DictVo.class);
+        pageVo = pageVo.from( _page , DictVO.class);
         System.out.println(pageVo);
     }
 
