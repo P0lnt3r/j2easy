@@ -17,6 +17,13 @@ public class AccountServiceTest extends SpringTestCase {
     IAccountService accountService;
 
     @Test
+    public void testAssignRole(){
+        Long accountId = 1L;
+        Long[] roleIds = { 1L , 2L , 3L };
+        accountService.assignRole(accountId , roleIds);
+    }
+
+    @Test
     public void test(){
         Account account = new Account();
         account.setUsername("Hello");

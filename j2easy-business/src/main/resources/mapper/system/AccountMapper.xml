@@ -45,4 +45,16 @@
          </if>
 </select>
 
+<delete id="clearRole" >
+    DELETE FROM TB_SYSTEM_ACCOUNTROLE
+     WHERE ACCOUNT_ID = #{id}
+</delete>
+
+<insert id="assignRole" >
+    insert into tb_system_accountrole(account_id, role_id) values
+    <foreach collection="roleIds" item="roleId" separator=",">
+        (#{id}, #{roleId})
+    </foreach>
+</insert>
+
 </mapper>

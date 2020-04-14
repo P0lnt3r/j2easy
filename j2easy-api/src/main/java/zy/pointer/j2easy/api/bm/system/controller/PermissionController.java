@@ -45,7 +45,7 @@ public class PermissionController {
     }
 
     @GetMapping("/catalog")
-    @ApiOperation("获取菜单权限树")
+    @ApiOperation("获取菜单树")
     @ApiImplicitParams({
             @ApiImplicitParam( paramType="query", name="prefix", dataType="String", required=true, value="/api/bm" ),
     })
@@ -58,7 +58,7 @@ public class PermissionController {
         if ( tree.get( prefix ) != null ){
             TreeNodePermissionVO root = tree.get(prefix).convert( TreeNodePermissionVO.class , (pathTreeNode , vo ) -> {
                 Permission permission = (Permission)pathTreeNode.getPayload();
-                vo.setKey( permission.getValue() );
+                vo.setKey( permission.getId() + "" );
                 vo.setTitle(permission.getName());
                 vo.setPayload( new PermissionVO().from( permission , PermissionVO.class ) );
                 return vo;
@@ -67,6 +67,31 @@ public class PermissionController {
         }
         return new ArrayList<>();
     }
+
+    @GetMapping("/permissionTree")
+    @ApiOperation("获取权限树")
+    @ApiImplicitParams({
+            @ApiImplicitParam( paramType="query", name="prefix", dataType="String", required=true, value="/api/bm" ),
+    })
+    public List<TreeNodePermissionVO> permissionTree(final String prefix ) throws InstantiationException, IllegalAccessException {
+        List<Permission> permissionList = permissionService.list().stream()
+                .filter(permission -> permission.getPath() != null && permission.getPath().startsWith(prefix) )
+                .collect( Collectors.toList() );
+        PathTree<Permission> tree = new PathTree<Permission>();
+        permissionList.forEach( permission -> tree.put( new PathTreeNode( permission.getPath() , permission.getName() , permission )) );
+        if ( tree.get( prefix ) != null ){
+            TreeNodePermissionVO root = tree.get(prefix).convert( TreeNodePermissionVO.class , (pathTreeNode , vo ) -> {
+                Permission permission = (Permission)pathTreeNode.getPayload();
+                vo.setKey( permission.getId() + "" );
+                vo.setTitle(permission.getName());
+                vo.setPayload( new PermissionVO().from( permission , PermissionVO.class ) );
+                return vo;
+            } );
+            return root.getChildren();
+        }
+        return new ArrayList<>();
+    }
+
 
     @GetMapping("/query")
     @ApiOperation("分页查询")

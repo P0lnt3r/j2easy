@@ -29,4 +29,6 @@ public interface IAccountService extends BusinessService<Account> {
 
     List<Role> getRoleList( Long id );
 
+    int assignRole( Long id , Long[] roleIds );
+
 }

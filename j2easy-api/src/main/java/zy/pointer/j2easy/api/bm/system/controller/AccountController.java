@@ -84,4 +84,15 @@ public class AccountController {
         } ).collect( Collectors.toList() );
     }
 
+    @PostMapping( value = "assignRole")
+    @ApiOperation("为账户分配角色")
+    @ApiImplicitParams({
+            @ApiImplicitParam( paramType="query", name="id", dataType="Long", required=true, value="账户ID" ),
+            @ApiImplicitParam( paramType="query", name="roleIds", dataType="Array", required=true, value="角色ID数组" )
+    })
+    public int assignRole( @NotEmpty Long id , @NotEmpty Long[] roleIds ){
+        return accountService.assignRole(id , roleIds);
+    }
+
+
 }

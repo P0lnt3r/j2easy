@@ -95,6 +95,15 @@ public class AccountServiceImpl extends AbsBusinessService<AccountMapper, Accoun
         return roleMapper.selectAccountRoleList( id );
     }
 
+    @Override
+    public int assignRole(Long id, Long[] roleIds) {
+        // 清掉账户已经分配的角色.
+        getBaseMapper().clearRole( id );
+        // 重新装上新的角色
+        getBaseMapper().assignRole( id , roleIds );
+        return 0;
+    }
+
     public static void main(String[] args) {
        String salt = RandomUtil.randomNumbers(8);
        String password = "123456";

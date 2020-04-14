@@ -12,11 +12,15 @@ public interface RoleMapper extends RepositoryMapper<Role> {
 
     /**
      * 为角色加载权限
-     * @param role
+     * @param id 角色ID
      * @return
      */
     Role selectRoleWithPermission( @Param("id") Long id );
 
     List<Role> selectAccountRoleList( @Param("accountId") Long accountId );
+
+    void clearPermission( @Param("id") Long id );
+
+    int assignPermission( @Param("id") Long id , @Param("permissionIds") Long[] permissionIds );
 
 }
