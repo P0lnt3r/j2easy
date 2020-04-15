@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.system.mapper.RoleMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.system.entity.Role"  extends="common.BaseEntityResultMap">
+        <result column="NAME" property="name" />
+        <result column="REALM" property="realm" />
+        <result column="STATE" property="state" />
+    </resultMap>
+
+    <resultMap id="RolePermissionResultMap" type="zy.pointer.j2easy.business.system.entity.Role"  extends="BaseResultMap">
+        <collection property="permissionList" javaType="java.util.ArrayList" ofType="zy.pointer.j2easy.business.system.entity.Permission"
+                    columnPrefix="PERMISSION_"
+                    resultMap="zy.pointer.j2easy.business.system.mapper.PermissionMapper.BaseResultMap">
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        NAME, REALM, STATE
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM tb_system_role WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.name != null and '' != params.name">AND NAME = #{params.name}</if>
+        <if test="params.realm != null and '' != params.realm">AND REALM = #{params.realm}</if>
+        <if test="params.state != null and '' != params.state">AND STATE = #{params.state}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR NAME LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+<select id="selectRoleWithPermission" resultMap="RolePermissionResultMap">
+    SELECT TB_SYSTEM_ROLE.*,
+           tb_system_permission._ID   PERMISSION__ID,
+           tb_system_permission.NAME  PERMISSION_NAME,
+           tb_system_permission.TYPE  PERMISSION_TYPE,
+           tb_system_permission.PATH  PERMISSION_PATH,
+           tb_system_permission.VAL   PERMISSION_VAL,
+           tb_system_permission.STATE PERMISSION_STATE,
+           tb_system_permission.LEVEL PERMISSION_LEVEL
+    FROM TB_SYSTEM_ROLE
+             LEFT JOIN tb_system_rolepermission on TB_SYSTEM_ROLE._ID = tb_system_rolepermission.ROLE_ID
+             LEFT JOIN tb_system_permission on tb_system_rolepermission.PERMISSION_ID = tb_system_permission._ID
+   WHERE TB_SYSTEM_ROLE._ID = #{ id }
+</select>
+
+<select id="selectAccountRoleList" resultMap="BaseResultMap">
+    SELECT tb_system_ROLE.*
+      FROM tb_system_ROLE LEFT JOIN TB_SYSTEM_ACCOUNTROLE ON tb_system_ROLE._ID = TB_SYSTEM_ACCOUNTROLE.ROLE_ID
+    WHERE TB_SYSTEM_ACCOUNTROLE.ACCOUNT_ID = #{accountId}
+</select>
+
+<delete id="clearPermission">
+    DELETE FROM TB_SYSTEM_ROLEPERMISSION
+     WHERE ROLE_ID = #{id}
+</delete>
+
+<insert id="assignPermission">
+    INSERT INTO TB_SYSTEM_ROLEPERMISSION( ROLE_ID , PERMISSION_ID ) values
+    <foreach collection="permissionIds" item="permissionId" separator=",">
+        (#{id}, #{permissionId})
+    </foreach>
+</insert>
+
+</mapper>
