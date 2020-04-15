@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.cms.mapper.CourseMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.cms.entity.Course"  extends="common.BaseEntityResultMap">
+        <result column="NAME" property="name" />
+        <result column="QUESTIONS" property="questions" />
+        <result column="REPLIES" property="replies" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        NAME
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM tb_cms_course WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.name != null and '' != params.name">AND NAME = #{params.name}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR NAME LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+<select id="listCourseWithCount" resultMap="BaseResultMap">
+    SELECT tb_cms_course.* ,
+           ( SELECT COUNT(1) FROM tb_cms_discuss where tb_cms_discuss.COURSE_ID = tb_cms_course._ID AND tb_cms_discuss.TYPE = 1  ) QUESTIONS,
+           ( SELECT COUNT(1) FROM tb_cms_discuss where tb_cms_discuss.COURSE_ID = tb_cms_course._ID AND tb_cms_discuss.TYPE != 1 ) REPLIES
+      FROM tb_cms_course
+</select>
+
+</mapper>

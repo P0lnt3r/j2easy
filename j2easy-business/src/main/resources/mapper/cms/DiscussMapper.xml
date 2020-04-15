@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.cms.mapper.DiscussMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.cms.entity.Discuss"  extends="common.BaseEntityResultMap">
+        <result column="TYPE" property="type" />
+        <result column="TITLE" property="title" />
+        <result column="CONTENT" property="content" />
+        <result column="COURSE_ID" property="courseId" />
+        <result column="USER_ID" property="userId" />
+        <result column="DISCUSS_ID" property="discussId" />
+        <result column="REPLY_DISCUSS_ID" property="replyDiscussId" />
+        <result column="REF_DISCUSS_ID" property="refDiscussId" />
+        <result column="ANSWER_COUNT" property="answerCount" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        TYPE, TITLE, CONTENT, COURSE_ID, USER_ID, DISCUSS_ID, REPLY_DISCUSS_ID, REF_DISCUSS_ID, ANSWER_COUNT
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM tb_cms_discuss WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.type != null and '' != params.type">AND TYPE = #{params.type}</if>
+        <if test="params.title != null and '' != params.title">AND TITLE = #{params.title}</if>
+        <if test="params.content != null and '' != params.content">AND CONTENT = #{params.content}</if>
+        <if test="params.courseId != null and '' != params.courseId">AND COURSE_ID = #{params.courseId}</if>
+        <if test="params.userId != null and '' != params.userId">AND USER_ID = #{params.userId}</if>
+        <if test="params.discussId != null and '' != params.discussId">AND DISCUSS_ID = #{params.discussId}</if>
+        <if test="params.replyDiscussId != null and '' != params.replyDiscussId">AND REPLY_DISCUSS_ID = #{params.replyDiscussId}</if>
+        <if test="params.refDiscussId != null and '' != params.refDiscussId">AND REF_DISCUSS_ID = #{params.refDiscussId}</if>
+        <if test="params.answerCount != null and '' != params.answerCount">AND ANSWER_COUNT = #{params.answerCount}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR TITLE LIKE CONCAT('%',#{params.keywords},'%')
+              OR CONTENT LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+</mapper>

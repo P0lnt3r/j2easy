@@ -24,7 +24,7 @@ public class CodeGenerator {
     /*************************************** 数据源配置 ******************************************************/
     static String DATASOUCE_URL , DATASOURCE_DRIVER_NAME , DATASOURCE_USERNAME , DATASOURCE_PASSWORD ;
     static {
-        DATASOUCE_URL = "jdbc:mysql://localhost:3306/j2easy?serverTimezone=UTC&useSSL=false&characterEncoding=utf8";
+        DATASOUCE_URL = "jdbc:mysql://localhost:3306/blockchainedu?serverTimezone=UTC&useSSL=false&characterEncoding=utf8";
         DATASOURCE_DRIVER_NAME = "com.mysql.cj.jdbc.Driver";
         DATASOURCE_USERNAME = "root";
         DATASOURCE_PASSWORD = "123456";
