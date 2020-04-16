@@ -13,7 +13,18 @@
         <result column="DISCUSS_ID" property="discussId" />
         <result column="REPLY_DISCUSS_ID" property="replyDiscussId" />
         <result column="REF_DISCUSS_ID" property="refDiscussId" />
-        <result column="ANSWER_COUNT" property="answerCount" />
+
+        <!-- EXTRAS -->
+        <result column="REPLY_COUNT" property="replyCount"    />
+        <result column="COURSE_NAME" property="courseName"      />
+        <result column="USER_NAME" property="userName"          />
+        <result column="USER_TYPE" property="userType"          />
+
+        <!-- DISCUSS_ -->
+        <result column="DISCUSS_TITLE" property="discussTitle" />
+        <result column="DISCUSS_CONTENT" property="discussContent" />
+        <result column="DISCUSS_REPLY_CONTENT" property="discussReplyContent" />
+        <result column="DISCUSS_REF_CONTENT" property="discussRefContent" />
     </resultMap>
 
     <!-- 通用查询结果列  -->
@@ -26,6 +37,35 @@
         TYPE, TITLE, CONTENT, COURSE_ID, USER_ID, DISCUSS_ID, REPLY_DISCUSS_ID, REF_DISCUSS_ID, ANSWER_COUNT
     </sql>
 
+<select id="selectByMapForPage_replies" resultMap="BaseResultMap">
+    SELECT tb_cms_course.NAME COURSE_NAME ,
+           tb_cms_user.NAME USER_NAME ,
+           tb_cms_user.TYPE USER_TYPE ,
+           (SELECT TITLE FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_TITLE,
+           (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_CONTENT,
+           (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.REPLY_DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_REPLY_CONTENT,
+           (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.REF_DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_REF_CONTENT,
+           DISCUSS.*
+    FROM ( SELECT * FROM tb_cms_discuss where TYPE = 2 ) DISCUSS
+             LEFT JOIN tb_cms_course on DISCUSS.course_id = tb_cms_course._ID
+             LEFT JOIN tb_cms_user ON DISCUSS.USER_ID = tb_cms_user.USER_ID
+</select>
+
+<select id="selectByMapForPage_extras" resultMap="BaseResultMap">
+    SELECT tb_cms_course.NAME COURSE_NAME ,
+           tb_cms_user.NAME USER_NAME ,
+           tb_cms_user.TYPE USER_TYPE ,
+          (SELECT COUNT(1) FROM tb_cms_discuss where tb_cms_discuss.DISCUSS_ID = DISCUSS._ID AND tb_cms_discuss._DB_STATE = 1) REPLY_COUNT,
+           DISCUSS.*
+    FROM ( SELECT * FROM tb_cms_discuss where _DB_STATE = 1 AND TYPE = #{params.type} ) DISCUSS
+             LEFT JOIN tb_cms_course on DISCUSS.course_id = tb_cms_course._ID
+             LEFT JOIN tb_cms_user ON DISCUSS.USER_ID = tb_cms_user.USER_ID
+      <where>
+          <if test="params.courseId != null and '' != params.courseId">AND DISCUSS.COURSE_ID = #{params.courseId}</if>
+          <if test="params.userId != null and '' != params.userId">AND DISCUSS.USER_ID = #{params.userId}</if>
+          <if test="params.title != null and '' != params.title">AND DISCUSS.TITLE LIKE CONCAT('%',#{params.title},'%')</if>
+      </where>
+</select>
 
 <select id="selectByMapForPage" resultMap="BaseResultMap">
 		SELECT <include refid="Base_Column_List" /> FROM tb_cms_discuss WHERE _DB_STATE = 1

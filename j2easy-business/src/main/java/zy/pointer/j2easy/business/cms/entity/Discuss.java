@@ -54,7 +54,32 @@ public class Discuss extends BaseEntity{
     @TableField("REF_DISCUSS_ID")
     private Long refDiscussId;
 
-    @TableField("ANSWER_COUNT")
-    private Integer answerCount;
+    /**********************************/
+    @TableField( exist = false )
+    private Integer replyCount;
+
+    @TableField( exist = false )
+    private String courseName;
+
+    @TableField( exist = false )
+    private String userName;
+
+    @TableField( exist = false )
+    private Integer userType;
+    /**********************************/
+
+    /************************************/
+    @TableField( exist = false )
+    private String discussTitle;
+
+    @TableField( exist = false )
+    private String discussContent;
+
+    @TableField( exist = false )
+    private String discussRefContent;
+
+    @TableField( exist = false )
+    private String discussReplyContent;
+    /**********************************/
 
 }

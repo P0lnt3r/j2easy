@@ -7,6 +7,8 @@ import zy.pointer.j2easy.framework.web.model.vo.AbsValueObject;
 @Data
 public class CourseVO extends AbsValueObject<Course> {
 
+    private Long id;
+
     private String name;
 
     private Integer questions;
