@@ -31,6 +31,7 @@ public class DiscussController {
 
     @GetMapping("/queryReplies")
     public PageVo<DiscussVO , Discuss> queryReplies( DiscussQueryDTO DTO ){
+
         return new PageVo<DiscussVO , Discuss>().from(
                 discussService.selectByMapForPage_replies( DTO.convert() , BeanUtil.beanToMap( DTO )) ,
                 DiscussVO.class
@@ -41,6 +42,11 @@ public class DiscussController {
     @ApiOperation("讨论更新")
     public int update( DiscussDTO DTO ){
         return discussService.updateById( DTO.convert() ) ? 1 : 0;
+    }
+
+    @PostMapping("/remove")
+    public int remove( Long id ){
+        return discussService.removeById(id) ? 1 : 0;
     }
 
 
