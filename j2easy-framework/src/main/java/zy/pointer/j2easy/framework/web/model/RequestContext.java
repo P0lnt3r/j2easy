@@ -43,7 +43,8 @@ public class RequestContext {
         Enumeration<String> parameterNames = httpServletRequest.getHeaderNames();
         StringBuilder headerBuilder = new StringBuilder();
         while( parameterNames.hasMoreElements() ){
-            headerBuilder.append( httpServletRequest.getHeader( parameterNames.nextElement() ) + "\r\n" );
+            String header = parameterNames.nextElement();
+            headerBuilder.append( header + ":" + httpServletRequest.getHeader( header ) + "\r\n" );
         }
         this.headers = headerBuilder.toString();
 
