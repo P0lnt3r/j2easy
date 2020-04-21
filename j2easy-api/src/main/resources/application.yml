@@ -7,6 +7,9 @@ spring:
   profiles:
     active: dev
 
+  thymeleaf:
+    prefix: classpath:static/
+
   # 国际化资源配置
   messages:
     basename: i18n/messages , i18n/error_code
@@ -36,3 +39,8 @@ mybatis-plus:
       logic-delete-field: dbState
       logic-delete-value: 0
       logic-not-delete-value: 1
+
+tianze:
+  api:
+    endpoint: http://cloud.sztzjy.com
+

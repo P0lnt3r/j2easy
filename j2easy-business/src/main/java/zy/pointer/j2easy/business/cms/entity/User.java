@@ -26,7 +26,7 @@ public class User extends BaseEntity{
     private static final long serialVersionUID = 1L;
 
     @TableField("USER_ID")
-    private String userId;
+    private Long userId;
 
     @TableField("NAME")
     private String name;

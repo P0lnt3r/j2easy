@@ -1,5 +1,7 @@
 package zy.pointer.j2easy.business.cms.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.annotation.Transactional;
 import zy.pointer.j2easy.business.cms.entity.User;
@@ -21,4 +23,10 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class UserServiceImpl extends AbsBusinessService<UserMapper, User> implements IUserService {
 
+    @Override
+    public User findByUserId(Long userId) {
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq( User::getUserId , userId );
+        return getBaseMapper().selectOne( queryWrapper );
+    }
 }

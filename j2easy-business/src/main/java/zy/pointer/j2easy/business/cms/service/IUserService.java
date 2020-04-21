@@ -13,4 +13,6 @@ import zy.pointer.j2easy.framework.business.BusinessService;
  */
 public interface IUserService extends BusinessService<User> {
 
+    User findByUserId( Long userId );
+
 }
