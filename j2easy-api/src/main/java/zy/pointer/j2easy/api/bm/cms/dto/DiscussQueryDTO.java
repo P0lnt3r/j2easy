@@ -15,6 +15,8 @@ public class DiscussQueryDTO extends PageQueryDTO<Discuss> {
 
     private Long courseId;
 
+    private Long discussId;
+
     private String title;
 
 }

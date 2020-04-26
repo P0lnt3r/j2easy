@@ -31,7 +31,6 @@ public class DiscussController {
 
     @GetMapping("/queryReplies")
     public PageVo<DiscussVO , Discuss> queryReplies( DiscussQueryDTO DTO ){
-
         return new PageVo<DiscussVO , Discuss>().from(
                 discussService.selectByMapForPage_replies( DTO.convert() , BeanUtil.beanToMap( DTO )) ,
                 DiscussVO.class

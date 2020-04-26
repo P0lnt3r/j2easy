@@ -51,6 +51,7 @@
              LEFT JOIN tb_cms_user ON DISCUSS.USER_ID = tb_cms_user.USER_ID
     <where>
         <if test="params.courseId != null and '' != params.courseId">AND DISCUSS.COURSE_ID = #{params.courseId}</if>
+        <if test="params.discussId != null and '' != params.discussId">AND DISCUSS.DISCUSS_ID = #{params.discussId}</if>
         <if test="params.userId != null and '' != params.userId">AND DISCUSS.USER_ID = #{params.userId}</if>
         <if test="params.title != null and '' != params.title">AND DISCUSS.TITLE LIKE CONCAT('%',#{params.title},'%')</if>
     </where>

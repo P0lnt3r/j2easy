@@ -1,5 +1,6 @@
 package zy.pointer.j2easy.api.publics;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -7,16 +8,21 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import zy.pointer.j2easy.api.bm.cms.dto.DiscussQueryDTO;
+import zy.pointer.j2easy.api.bm.cms.vo.DiscussVO;
 import zy.pointer.j2easy.api.publics.component.TianzeClient;
 import zy.pointer.j2easy.api.publics.dto.UserVO;
+import zy.pointer.j2easy.business.cms.entity.Discuss;
 import zy.pointer.j2easy.business.cms.entity.User;
+import zy.pointer.j2easy.business.cms.service.IDiscussService;
 import zy.pointer.j2easy.business.cms.service.IUserService;
 import zy.pointer.j2easy.framework.auth.components.JWT;
 import zy.pointer.j2easy.framework.auth.jwt.JWTModel;
-import zy.pointer.j2easy.framework.commons.DateUtil;
+import zy.pointer.j2easy.framework.web.model.vo.PageVo;
 
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
@@ -35,6 +41,28 @@ public class PublicsController {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IDiscussService discussService;
+
+    @GetMapping("/getQuestions")
+    @ApiOperation("获取问题列表")
+    public PageVo<DiscussVO , Discuss> getQuestions(DiscussQueryDTO DTO){
+        return new PageVo<DiscussVO , Discuss>().from(
+                discussService.selectByMapForPage_extras( DTO.convert() , BeanUtil.beanToMap( DTO )) ,
+                DiscussVO.class
+        );
+    }
+
+    @GetMapping("/getReplies")
+    @ApiOperation("获取回复列表")
+    public PageVo<DiscussVO , Discuss> getReplies( DiscussQueryDTO DTO ){
+        return new PageVo<DiscussVO , Discuss>().from(
+                discussService.selectByMapForPage_replies( DTO.convert() , BeanUtil.beanToMap( DTO )) ,
+                DiscussVO.class
+        );
+    }
+
 
     @PostMapping("/checkJWT")
     @ApiOperation("远程检测 JWT 合法性")
