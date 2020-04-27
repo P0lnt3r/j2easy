@@ -22,4 +22,6 @@ public interface DiscussMapper extends RepositoryMapper<Discuss> {
 
     IPage<Discuss> selectByMapForPage_replies( Page<Discuss> page , @Param("params") Map<String,Object> params );
 
+    Discuss selectQuestionById( @Param("id") Long id );
+
 }

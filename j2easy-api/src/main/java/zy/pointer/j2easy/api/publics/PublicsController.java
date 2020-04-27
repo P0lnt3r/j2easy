@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import zy.pointer.j2easy.api.bm.cms.dto.DiscussDTO;
 import zy.pointer.j2easy.api.bm.cms.dto.DiscussQueryDTO;
 import zy.pointer.j2easy.api.bm.cms.vo.DiscussVO;
 import zy.pointer.j2easy.api.publics.component.TianzeClient;
@@ -57,10 +58,26 @@ public class PublicsController {
     @GetMapping("/getReplies")
     @ApiOperation("获取回复列表")
     public PageVo<DiscussVO , Discuss> getReplies( DiscussQueryDTO DTO ){
+//        DTO.setOrderProp("id");
+//        DTO.setOrderMode("desc");
         return new PageVo<DiscussVO , Discuss>().from(
                 discussService.selectByMapForPage_replies( DTO.convert() , BeanUtil.beanToMap( DTO )) ,
                 DiscussVO.class
         );
+    }
+
+    @PostMapping("/reply")
+    @ApiOperation("回复")
+    public int reply(DiscussDTO DTO){
+        DTO.setUserId( 1002L );
+        return discussService.save( DTO.convert()  )  ? 1 : 0;
+    }
+
+    @GetMapping("/getQuestion")
+    @ApiOperation(("获取问题信息"))
+    public DiscussVO getQuestion( Long id ){
+        Discuss question = discussService.getQuestionById(id);
+        return new DiscussVO().from( question , DiscussVO.class );
     }
 
 

@@ -22,4 +22,6 @@ public interface IDiscussService extends BusinessService<Discuss> {
 
     IPage<Discuss> selectByMapForPage_replies(Page<Discuss> page , @Param("params") Map<String,Object> params);
 
+    Discuss getQuestionById( Long id );
+
 }

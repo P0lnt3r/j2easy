@@ -19,6 +19,7 @@
         <result column="COURSE_NAME" property="courseName"      />
         <result column="USER_NAME" property="userName"          />
         <result column="USER_TYPE" property="userType"          />
+        <result column="USER_REGIST_TIME" property="userRegistTime"          />
 
         <!-- DISCUSS_ -->
         <result column="DISCUSS_TITLE" property="discussTitle" />
@@ -41,6 +42,7 @@
     SELECT tb_cms_course.NAME COURSE_NAME ,
            tb_cms_user.NAME USER_NAME ,
            tb_cms_user.TYPE USER_TYPE ,
+           tb_cms_user.REGIST_TIME USER_REGIST_TIME ,
            (SELECT TITLE FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_TITLE,
            (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_CONTENT,
            (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.REPLY_DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_REPLY_CONTENT,
@@ -71,6 +73,18 @@
           <if test="params.userId != null and '' != params.userId">AND DISCUSS.USER_ID = #{params.userId}</if>
           <if test="params.title != null and '' != params.title">AND DISCUSS.TITLE LIKE CONCAT('%',#{params.title},'%')</if>
       </where>
+</select>
+
+<select id="selectQuestionById" resultMap="BaseResultMap">
+    SELECT tb_cms_course.NAME COURSE_NAME ,
+    tb_cms_user.NAME USER_NAME ,
+    tb_cms_user.TYPE USER_TYPE ,
+    (SELECT COUNT(1) FROM tb_cms_discuss where tb_cms_discuss.DISCUSS_ID = DISCUSS._ID AND tb_cms_discuss._DB_STATE = 1) REPLY_COUNT,
+    DISCUSS.*
+    FROM ( SELECT * FROM tb_cms_discuss where _DB_STATE = 1 AND TYPE = 1 ) DISCUSS
+    LEFT JOIN tb_cms_course on DISCUSS.course_id = tb_cms_course._ID
+    LEFT JOIN tb_cms_user ON DISCUSS.USER_ID = tb_cms_user.USER_ID
+    WHERE DISCUSS._ID = #{id}
 </select>
 
 <select id="selectByMapForPage" resultMap="BaseResultMap">

@@ -46,28 +46,37 @@ public abstract class PageQueryDTO< Entity extends BaseEntity > {
         if ( orderProp != null && !"".equals(orderProp.trim()) ){
             String column = getColumn( this.orderProp );
             if ( column == null ){
+                Field field = null;
                 try {
                     Class clazz = ReflectUtil.getGenericsClass( this.getClass() , 0 );
-                    Field field = clazz.getDeclaredField( orderProp );
-                    TableField tableField = null;
-                    if ( (tableField = field.getDeclaredAnnotation( TableField.class )) != null ){
-                        String columnName = tableField.value(); // 属性对应的列名
-                        if ( !"asc".equals( orderMode ) && !"desc".equals(orderMode) ){
-                            orderMode = "desc";
-                        }
-                        OrderItem orderItem = new OrderItem();
-                        orderItem.setAsc( "asc".equals( orderMode ) );
-                        orderItem.setColumn(columnName);
-                        page.addOrder(orderItem);
-                    }
+                    field = clazz.getDeclaredField( orderProp );
                 }catch ( Exception e ){
-                    column = null;
+                    try {
+                        field = BaseEntity.class.getDeclaredField( orderProp );
+                    } catch (NoSuchFieldException ex) {
+                        field = null;
+                    }
+                }
+                TableField tableField = null;
+                if ( field != null && (tableField = field.getDeclaredAnnotation( TableField.class )) != null ){
+                    String columnName = tableField.value(); // 属性对应的列名
+                    if ( !"asc".equals( orderMode ) && !"desc".equals(orderMode) ){
+                        orderMode = "desc";
+                    }
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setAsc( "asc".equals( orderMode ) );
+                    orderItem.setColumn(columnName);
+                    page.addOrder(orderItem);
+                }
+                if ( "id".equals( orderProp ) ){
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setAsc( "asc".equals( orderMode ) );
+                    orderItem.setColumn("_ID");
+                    page.addOrder(orderItem);
                 }
             }
         }
         return page;
     }
-
-
 
 }

@@ -34,4 +34,9 @@ public class DiscussServiceImpl extends AbsBusinessService<DiscussMapper, Discus
     public IPage<Discuss> selectByMapForPage_replies(Page<Discuss> page, Map<String, Object> params) {
         return getBaseMapper().selectByMapForPage_replies(page , params);
     }
+
+    @Override
+    public Discuss getQuestionById(Long id) {
+        return getBaseMapper().selectQuestionById(id);
+    }
 }

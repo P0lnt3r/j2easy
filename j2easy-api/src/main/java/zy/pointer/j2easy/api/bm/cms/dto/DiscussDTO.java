@@ -9,8 +9,16 @@ public class DiscussDTO extends AbsDataTransferObject<Discuss> {
 
     private Long id ;
 
+    private Integer type;
+
     private String title;
 
     private String content;
+
+    private Long discussId;
+
+    private Long courseId;
+
+    private Long userId;
 
 }

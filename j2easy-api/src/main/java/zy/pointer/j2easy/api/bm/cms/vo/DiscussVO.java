@@ -21,7 +21,7 @@ public class DiscussVO extends AbsValueObject<Discuss> {
 
     private Integer replyCount;
 
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     /***************************************/
@@ -31,6 +31,9 @@ public class DiscussVO extends AbsValueObject<Discuss> {
     private String userName;
 
     private Integer userType;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime userRegistTime;
     /***************************************/
 
     /***************************************/
@@ -39,6 +42,8 @@ public class DiscussVO extends AbsValueObject<Discuss> {
 
     private String courseName;
     /***************************************/
+
+    private Long discussId;
 
     private String discussTitle;
 
