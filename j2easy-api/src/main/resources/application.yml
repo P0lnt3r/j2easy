@@ -1,3 +1,7 @@
+
+server:
+  port: 8082
+
 jwt:
   signature:
     secretkey: 8db801f3edf24d318f7bba30420e0b61

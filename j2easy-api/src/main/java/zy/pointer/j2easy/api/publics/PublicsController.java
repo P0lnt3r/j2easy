@@ -69,8 +69,15 @@ public class PublicsController {
     @PostMapping("/reply")
     @ApiOperation("回复")
     public int reply(DiscussDTO DTO){
-        DTO.setUserId( 1002L );
-        return discussService.save( DTO.convert()  )  ? 1 : 0;
+        DTO.setUserId( 1000L );
+        return discussService.save( DTO.convert()  )  ? 1:0;
+    }
+
+    @PostMapping("/question")
+    @ApiOperation("提问")
+    public int question( DiscussDTO DTO ){
+        DTO.setUserId( 1000L );
+        return discussService.save( DTO.convert() ) ? 1:0;
     }
 
     @GetMapping("/getQuestion")
