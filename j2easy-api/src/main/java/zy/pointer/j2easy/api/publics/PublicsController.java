@@ -23,8 +23,10 @@ import zy.pointer.j2easy.business.cms.service.IDiscussService;
 import zy.pointer.j2easy.business.cms.service.IUserService;
 import zy.pointer.j2easy.framework.auth.components.JWT;
 import zy.pointer.j2easy.framework.auth.jwt.JWTModel;
+import zy.pointer.j2easy.framework.web.model.RequestContext;
 import zy.pointer.j2easy.framework.web.model.vo.PageVo;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -68,15 +70,31 @@ public class PublicsController {
 
     @PostMapping("/reply")
     @ApiOperation("回复")
-    public int reply(DiscussDTO DTO){
-        DTO.setUserId( 1000L );
+    public int reply(DiscussDTO DTO , HttpServletRequest request){
+        String jwt = request.getHeader("jwt");
+        Long userId = null;
+        if ( jwt != null && !"".equals(jwt) ){
+            JWTModel model = jwtComponent.parse(jwt);
+            userId = Long.parseLong( model.getUid() );
+        }
+        if ( userId != null ){
+            DTO.setUserId(userId);
+        }
         return discussService.save( DTO.convert()  )  ? 1:0;
     }
 
     @PostMapping("/question")
     @ApiOperation("提问")
-    public int question( DiscussDTO DTO ){
-        DTO.setUserId( 1000L );
+    public int question( DiscussDTO DTO , HttpServletRequest request){
+        String jwt = request.getHeader("jwt");
+        Long userId = null;
+        if ( jwt != null && !"".equals(jwt) ){
+            JWTModel model = jwtComponent.parse(jwt);
+            userId = Long.parseLong( model.getUid() );
+        }
+        if ( userId != null ){
+            DTO.setUserId(userId);
+        }
         return discussService.save( DTO.convert() ) ? 1:0;
     }
 

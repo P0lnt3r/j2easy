@@ -17,7 +17,4 @@ public class TZApiResponse {
 
     private Object error;
 
-
-
-
 }
