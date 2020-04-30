@@ -40,22 +40,24 @@
 
 <select id="selectByMapForPage_replies" resultMap="BaseResultMap">
     SELECT tb_cms_course.NAME COURSE_NAME ,
-           tb_cms_user.NAME USER_NAME ,
-           tb_cms_user.TYPE USER_TYPE ,
-           tb_cms_user.REGIST_TIME USER_REGIST_TIME ,
-           (SELECT TITLE FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_TITLE,
-           (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_CONTENT,
-           (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.REPLY_DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_REPLY_CONTENT,
-           (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.REF_DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_REF_CONTENT,
-           DISCUSS.*
+    tb_cms_user.NAME USER_NAME ,
+    tb_cms_user.TYPE USER_TYPE ,
+    tb_cms_user.REGIST_TIME USER_REGIST_TIME ,
+    _DISCUSS.TITLE DISCUSS_TITLE,
+    _DISCUSS.CONTENT DISCUSS_CONTENT,
+    (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.REPLY_DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_REPLY_CONTENT,
+    (SELECT CONTENT FROM tb_cms_discuss where tb_cms_discuss._ID = DISCUSS.REF_DISCUSS_ID AND tb_cms_discuss._DB_STATE = 1) DISCUSS_REF_CONTENT,
+    DISCUSS.*
     FROM ( SELECT * FROM tb_cms_discuss where TYPE = 2 AND _DB_STATE = 1 ) DISCUSS
-             LEFT JOIN tb_cms_course on DISCUSS.course_id = tb_cms_course._ID
-             LEFT JOIN tb_cms_user ON DISCUSS.USER_ID = tb_cms_user.USER_ID
+        LEFT JOIN tb_cms_course on DISCUSS.course_id = tb_cms_course._ID
+        LEFT JOIN tb_cms_user ON DISCUSS.USER_ID = tb_cms_user.USER_ID
+        LEFT JOIN ( SELECT * FROM tb_cms_discuss WHERE tb_cms_discuss._DB_STATE = 1) _DISCUSS ON _DISCUSS._ID = DISCUSS.DISCUSS_ID
     <where>
         <if test="params.courseId != null and '' != params.courseId">AND DISCUSS.COURSE_ID = #{params.courseId}</if>
         <if test="params.discussId != null and '' != params.discussId">AND DISCUSS.DISCUSS_ID = #{params.discussId}</if>
         <if test="params.userId != null and '' != params.userId">AND DISCUSS.USER_ID = #{params.userId}</if>
-        <if test="params.title != null and '' != params.title">AND DISCUSS.TITLE LIKE CONCAT('%',#{params.title},'%')</if>
+        <if test="params.userName != null and '' != params.userName">AND tb_cms_user.NAME = #{params.userName}</if>
+        <if test="params.discussTitle != null and '' != params.discussTitle">AND _DISCUSS.TITLE LIKE CONCAT('%',#{params.discussTitle},'%')</if>
     </where>
 </select>
 
@@ -71,6 +73,7 @@
       <where>
           <if test="params.courseId != null and '' != params.courseId">AND DISCUSS.COURSE_ID = #{params.courseId}</if>
           <if test="params.userId != null and '' != params.userId">AND DISCUSS.USER_ID = #{params.userId}</if>
+          <if test="params.userName != null and '' != params.userName">AND tb_cms_user.NAME = #{params.userName}</if>
           <if test="params.title != null and '' != params.title">AND DISCUSS.TITLE LIKE CONCAT('%',#{params.title},'%')</if>
       </where>
 </select>

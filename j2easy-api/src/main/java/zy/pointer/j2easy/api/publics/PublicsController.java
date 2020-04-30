@@ -71,30 +71,32 @@ public class PublicsController {
     @PostMapping("/reply")
     @ApiOperation("回复")
     public int reply(DiscussDTO DTO , HttpServletRequest request){
-        String jwt = request.getHeader("jwt");
-        Long userId = null;
-        if ( jwt != null && !"".equals(jwt) ){
-            JWTModel model = jwtComponent.parse(jwt);
-            userId = Long.parseLong( model.getUid() );
-        }
-        if ( userId != null ){
-            DTO.setUserId(userId);
-        }
+//        String jwt = request.getHeader("jwt");
+//        Long userId = null;
+//        if ( jwt != null && !"".equals(jwt) ){
+//            JWTModel model = jwtComponent.parse(jwt);
+//            userId = Long.parseLong( model.getUid() );
+//        }
+//        if ( userId != null ){
+//            DTO.setUserId(userId);
+//        }
+        DTO.setUserId(1000L);
         return discussService.save( DTO.convert()  )  ? 1:0;
     }
 
     @PostMapping("/question")
     @ApiOperation("提问")
     public int question( DiscussDTO DTO , HttpServletRequest request){
-        String jwt = request.getHeader("jwt");
-        Long userId = null;
-        if ( jwt != null && !"".equals(jwt) ){
-            JWTModel model = jwtComponent.parse(jwt);
-            userId = Long.parseLong( model.getUid() );
-        }
-        if ( userId != null ){
-            DTO.setUserId(userId);
-        }
+//        String jwt = request.getHeader("jwt");
+//        Long userId = null;
+//        if ( jwt != null && !"".equals(jwt) ){
+//            JWTModel model = jwtComponent.parse(jwt);
+//            userId = Long.parseLong( model.getUid() );
+//        }
+//        if ( userId != null ){
+//            DTO.setUserId(userId);
+//        }
+        DTO.setUserId(1000L);
         return discussService.save( DTO.convert() ) ? 1:0;
     }
 
