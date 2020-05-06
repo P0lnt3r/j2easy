@@ -171,7 +171,6 @@ public abstract class AbsBusinessService<
 
     @Override
     public IPage<Entity> page(IPage<Entity> page) {
-        System.out.println("===========================");
         return getBaseMapper().selectPage(page , null);
     }
 
