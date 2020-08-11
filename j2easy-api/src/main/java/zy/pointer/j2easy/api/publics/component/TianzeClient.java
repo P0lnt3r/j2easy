@@ -27,7 +27,7 @@ public class TianzeClient implements InitializingBean {
         System.out.println(endpoint);
         okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(  5 , TimeUnit.SECONDS) 	//连接超时
-                .readTimeout(5 , TimeUnit.SECONDS) 		//读取超时
+                .readTimeout(5 , TimeUnit.SECONDS) 		    //读取超时
                 .build();
     }
 

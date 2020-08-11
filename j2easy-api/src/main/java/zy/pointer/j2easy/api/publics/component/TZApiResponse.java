@@ -17,4 +17,35 @@ public class TZApiResponse {
 
     private Object error;
 
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
+    }
+
+    public Object getTargetUrl() {
+        return targetUrl;
+    }
+
+    public void setTargetUrl(Object targetUrl) {
+        this.targetUrl = targetUrl;
+    }
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
+
+    public Object getError() {
+        return error;
+    }
+
+    public void setError(Object error) {
+        this.error = error;
+    }
 }

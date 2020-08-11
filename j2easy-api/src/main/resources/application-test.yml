@@ -5,9 +5,9 @@ spring:
 
   # 数据源配置
   datasource:
-    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    #driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:p6spy:mysql://localhost:3306/j2easy?serverTimezone=UTC&useSSL=false&characterEncoding=utf8
+    #driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://120.77.153.35:3306/blockchainedu?serverTimezone=UTC&useSSL=false&characterEncoding=utf8
     username: root
     password: 123456
 

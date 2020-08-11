@@ -15,6 +15,10 @@ public enum  ErrorCode implements IErrorCode {
     ERROR_CODE_1404( "1404" , "404 - 资源不存在" ),
     ERROR_CODE_1405( "1405" , "方法访问错误"),
 
+    ERROR_CODE_2001( "2001" , "资产发行失败,资产名称或资产简称已被使用" ),
+    ERROR_CODE_2002( "2002" , "资产发行失败,账户信用资产不足"),
+    ERROR_CODE_2003( "2003" , "资产出售失败,可用资产不足" ),
+
     // 占位
     ERROR_CODE_NULL( "" , "" );
 

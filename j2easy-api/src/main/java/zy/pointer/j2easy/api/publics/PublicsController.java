@@ -81,7 +81,7 @@ public class PublicsController {
 //            DTO.setUserId(userId);
 //        }
         DTO.setUserId(1000L);
-        return discussService.save( DTO.convert()  )  ? 1:0;
+        return discussService.save( DTO.convert()  ) ? 1:0;
     }
 
     @PostMapping("/question")
@@ -96,7 +96,7 @@ public class PublicsController {
 //        if ( userId != null ){
 //            DTO.setUserId(userId);
 //        }
-        DTO.setUserId(1000L);
+//        DTO.setUserId(1000L);
         return discussService.save( DTO.convert() ) ? 1:0;
     }
 
