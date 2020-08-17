@@ -1,13 +1,11 @@
 env:
   test
-
 spring:
-
   # 数据源配置
   datasource:
     #driver-class-name: com.p6spy.engine.spy.P6SpyDriver
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://120.77.153.35:3306/blockchainedu?serverTimezone=UTC&useSSL=false&characterEncoding=utf8
+    url: jdbc:mysql://120.77.153.35:3306/blockchainedu?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=utf8
     username: root
     password: 123456
 

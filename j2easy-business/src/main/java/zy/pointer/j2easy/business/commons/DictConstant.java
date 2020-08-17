@@ -15,11 +15,24 @@ public enum  DictConstant {
 
     ASSET_FLOW_TYPE_ADD( "1" , "asset.flow.type.add" , "流水类型:增加" ),
     ASSET_FLOW_TYPE_ADD_ISSUE( "资产发行" , "asset.flow.type.add.issue" , "流水增加详情:资产发行" ),
+    ASSET_FLOW_TYPE_ADD_SELLINCOME( "售卖收益" , "asset.flow.type.add.sellincome" , "流水增加详情:售卖收益" ),
+    ASSET_FLOW_TYPE_ADD_TRANSIN( "资产转入" , "asset.flow.type.add.transin" , "流水增加详情:资产转入" ),
     ASSET_FLOW_TYPE_SUB( "2" , "asset.flow.type.sub" , "流水类型:减少" ),
     ASSET_FLOW_TYPE_SUB_MORTGAGE( "资产抵押" , "asset.flow.type.sub.mortgage" , "流水减少详情:资产抵押" ),
+    ASSET_FLOW_TYPE_SUB_PAY( "购买支出" , "asset.flow.type.sub.buy" , "流水减少详情:购买支出" ),
+    ASSET_FLOW_TYPE_SUB_TRANSOUT( "资产转出" , "asset.flow.type.sub.transout" , "流水减少详情:资产转出" ),
 
     ASSET_TYPE_CREDIT( "0" , "asset.type.credit" , "资产类型:信用资产" ),
     ASSET_TYPE_TOKEN( "1" , "asset.type.token" , "资产类型:通证资产" ),
+
+    ASSET_TRADE_STATE_SELLOUT( "0" , "asset.trade.state.sellout" , "订单状态:售罄" ),
+    ASSET_TRADE_STATE_SELLING( "1" , "asset.trade.state.selling" , "订单状态:在售" ),
+
+    ASSET_TRANSFER_STATE_WAIT( "0" , "asset.transfer.state.wait" , "资产交易状态:待确认" ),
+    ASSET_TRANSFER_STATE_CONFIRMED( "1" , "asset.transfer.state.confirmed" , "资产交易状态:已确认" ),
+
+    ASSET_TRANSFER_TYPE_DOTRASFER( "1" , "asset.transfer.type.dotransfer" , "资产转让类型:转让" ),
+    ASSET_TRANSFER_TYPE_DOTRADE(  "2" , "asset.trasfer.type.dotrade" , "资产转让类型:交易"),
 
     NULL( "","","" );
 
