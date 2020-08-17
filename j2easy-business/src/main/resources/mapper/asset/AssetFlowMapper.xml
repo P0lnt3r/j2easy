@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.asset.mapper.AssetFlowMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.asset.entity.AssetFlow"  extends="common.BaseEntityResultMap">
+        <result column="USER_ID" property="userId" />
+        <result column="REF_ID" property="refId" />
+        <result column="TYPE" property="type" />
+        <result column="TYPE_TINY" property="typeTiny" />
+        <result column="ASSET_ID" property="assetId" />
+        <result column="ASSET_AMOUNT" property="assetAmount" />
+        <result column="REF_UPDATE" property="refUpdate" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        USER_ID, REF_ID, TYPE, TYPE_TINY, ASSET_ID, ASSET_AMOUNT, REF_UPDATE
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM asset_flow WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.userId != null and '' != params.userId">AND USER_ID = #{params.userId}</if>
+        <if test="params.refId != null and '' != params.refId">AND REF_ID = #{params.refId}</if>
+        <if test="params.type != null and '' != params.type">AND TYPE = #{params.type}</if>
+        <if test="params.typeTiny != null and '' != params.typeTiny">AND TYPE_TINY = #{params.typeTiny}</if>
+        <if test="params.assetId != null and '' != params.assetId">AND ASSET_ID = #{params.assetId}</if>
+        <if test="params.assetAmount != null and '' != params.assetAmount">AND ASSET_AMOUNT = #{params.assetAmount}</if>
+        <if test="params.refUpdate != null and '' != params.refUpdate">AND REF_UPDATE = #{params.refUpdate}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR USER_ID LIKE CONCAT('%',#{params.keywords},'%')
+              OR TYPE LIKE CONCAT('%',#{params.keywords},'%')
+              OR TYPE_TINY LIKE CONCAT('%',#{params.keywords},'%')
+              OR ASSET_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+              OR REF_UPDATE LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+</mapper>

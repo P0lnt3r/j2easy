@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.asset.mapper.AssetTransferMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.asset.entity.AssetTransfer"  extends="common.BaseEntityResultMap">
+        <result column="FROM_USER_ID" property="fromUserId" />
+        <result column="TO_USER_ID" property="toUserId" />
+        <result column="ASSET_ID" property="assetId" />
+        <result column="ASSET_AMOUNT" property="assetAmount" />
+        <result column="STATE" property="state" />
+        <result column="FROM_WALLET_ADDRESS" property="fromWalletAddress" />
+        <result column="TO_WALLET_ADDRESS" property="toWalletAddress" />
+        <result column="ASSET_SYMBOL" property="assetSymbol" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        FROM_USER_ID, TO_USER_ID, ASSET_ID, ASSET_AMOUNT, STATE
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+    SELECT T.* FROM (
+        select asset_transfer.* ,
+        ( select wallet_address from asset_account where asset_account.USER_ID = asset_transfer.FROM_USER_ID and asset_account.ASSET_ID = asset_transfer.ASSET_ID ) FROM_WALLET_ADDRESS,
+        ( select wallet_address from asset_account where asset_account.USER_ID = asset_transfer.TO_USER_ID and asset_account.ASSET_ID = asset_transfer.ASSET_ID ) TO_WALLET_ADDRESS,
+        ( SELECT ASSET_SYMBOL FROM asset_issue where asset_issue._id = asset_transfer.ASSET_ID ) ASSET_SYMBOL
+        from asset_transfer
+     ) T WHERE 1 = 1
+    <!-- 关键字模糊查询  -->
+        <if test="params.fromWalletAddress != null and '' != params.fromWalletAddress">
+            AND T.FROM_WALLET_ADDRESS = #{params.fromWalletAddress}
+        </if>
+        <if test="params.toWalletAddress != null and '' != params.toWalletAddress">
+            AND T.TO_WALLET_ADDRESS = #{params.toWalletAddress}
+        </if>
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR T.TX_ID LIKE CONCAT('%',#{params.keywords},'%')
+              OR T.FROM_WALLET_ADDRESS LIKE CONCAT('%',#{params.keywords},'%')
+              OR T.TO_WALLET_ADDRESS LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+
+
+</mapper>

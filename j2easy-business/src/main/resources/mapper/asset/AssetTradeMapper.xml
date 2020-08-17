@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.asset.mapper.AssetTradeMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.asset.entity.AssetTrade"  extends="common.BaseEntityResultMap">
+        <result column="TYPE" property="type" />
+        <result column="USER_ID" property="userId" />
+        <result column="ASSET_ID" property="assetId" />
+        <result column="TRADE_ASSET_ID" property="tradeAssetId" />
+        <result column="TRADE_PRICE" property="tradePrice" />
+        <result column="TRADE_AMOUNT" property="tradeAmount" />
+        <result column="DEAL_AMOUNT" property="dealAmount" />
+        <result column="LEFT_AMOUNT" property="leftAmount" />
+        <result column="STATE" property="state" />
+
+        <result column="ASSET_NAME" property="assetName" />
+        <result column="ASSET_SYMBOL" property="assetSymbol" />
+        <result column="TRADE_ASSET_NAME" property="tradeAssetName" />
+        <result column="TRADE_ASSET_SYMBOL" property="tradeAssetSymbol" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        TYPE, USER_ID, ASSET_ID, TRADE_ASSET_ID, TRADE_PRICE, TRADE_AMOUNT, DEAL_AMOUNT, LEFT_AMOUNT, STATE
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM asset_trade WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.type != null and '' != params.type">AND TYPE = #{params.type}</if>
+        <if test="params.userId != null and '' != params.userId">AND USER_ID = #{params.userId}</if>
+        <if test="params.assetId != null and '' != params.assetId">AND ASSET_ID = #{params.assetId}</if>
+        <if test="params.tradeAssetId != null and '' != params.tradeAssetId">AND TRADE_ASSET_ID = #{params.tradeAssetId}</if>
+        <if test="params.tradePrice != null and '' != params.tradePrice">AND TRADE_PRICE = #{params.tradePrice}</if>
+        <if test="params.tradeAmount != null and '' != params.tradeAmount">AND TRADE_AMOUNT = #{params.tradeAmount}</if>
+        <if test="params.dealAmount != null and '' != params.dealAmount">AND DEAL_AMOUNT = #{params.dealAmount}</if>
+        <if test="params.leftAmount != null and '' != params.leftAmount">AND LEFT_AMOUNT = #{params.leftAmount}</if>
+        <if test="params.state != null and '' != params.state">AND STATE = #{params.state}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR USER_ID LIKE CONCAT('%',#{params.keywords},'%')
+              OR TRADE_PRICE LIKE CONCAT('%',#{params.keywords},'%')
+              OR TRADE_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+              OR DEAL_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+              OR LEFT_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+    <select id="getAssetTrade" resultMap="BaseResultMap">
+        select asset_trade.* ,
+                ( select asset_issue.ASSET_NAME from asset_issue where asset_issue._ID = asset_trade.ASSET_ID ) ASSET_NAME ,
+                ( select asset_issue.ASSET_SYMBOL from asset_issue where asset_issue._ID = asset_trade.ASSET_ID ) ASSET_SYMBOL,
+			    ( select asset_issue.ASSET_NAME from asset_issue where asset_issue._ID = asset_trade.TRADE_ASSET_ID ) TRADE_ASSET_NAME,
+                ( select asset_issue.ASSET_SYMBOL from asset_issue where asset_issue._ID = asset_trade.TRADE_ASSET_ID ) TRADE_ASSET_SYMBOL
+          from asset_trade
+          WHERE asset_trade.TRADE_ASSET_ID = #{tradeAssetId}
+            AND ASSET_tRADE.state = 1
+          ORDER BY _ID DESC
+    </select>
+
+</mapper>

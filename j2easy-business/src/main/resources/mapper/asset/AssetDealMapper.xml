@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.asset.mapper.AssetDealMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.asset.entity.AssetDeal"  extends="common.BaseEntityResultMap">
+        <result column="TRADE_ID" property="tradeId" />
+        <result column="USER_ID" property="userId" />
+        <result column="PAY_ASSET_ID" property="payAssetId" />
+        <result column="PAY_ASSET_AMOUNT" property="payAssetAmount" />
+        <result column="RETURN_ASSET_ID" property="returnAssetId" />
+        <result column="RETURN_ASSET_AMOUNT" property="returnAssetAmount" />
+        <result column="PAY_FEE" property="payFee" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        TRADE_ID, USER_ID, PAY_ASSET_ID, PAY_ASSET_AMOUNT, RETURN_ASSET_ID, RETURN_ASSET_AMOUNT, PAY_FEE
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM asset_deal WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.tradeId != null and '' != params.tradeId">AND TRADE_ID = #{params.tradeId}</if>
+        <if test="params.userId != null and '' != params.userId">AND USER_ID = #{params.userId}</if>
+        <if test="params.payAssetId != null and '' != params.payAssetId">AND PAY_ASSET_ID = #{params.payAssetId}</if>
+        <if test="params.payAssetAmount != null and '' != params.payAssetAmount">AND PAY_ASSET_AMOUNT = #{params.payAssetAmount}</if>
+        <if test="params.returnAssetId != null and '' != params.returnAssetId">AND RETURN_ASSET_ID = #{params.returnAssetId}</if>
+        <if test="params.returnAssetAmount != null and '' != params.returnAssetAmount">AND RETURN_ASSET_AMOUNT = #{params.returnAssetAmount}</if>
+        <if test="params.payFee != null and '' != params.payFee">AND PAY_FEE = #{params.payFee}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR USER_ID LIKE CONCAT('%',#{params.keywords},'%')
+              OR PAY_ASSET_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+              OR RETURN_ASSET_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+              OR PAY_FEE LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+</mapper>

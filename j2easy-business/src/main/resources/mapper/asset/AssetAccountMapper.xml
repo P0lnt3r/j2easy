@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.asset.mapper.AssetAccountMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.asset.entity.AssetAccount"  extends="common.BaseEntityResultMap">
+        <result column="USER_ID" property="userId" />
+        <result column="WALLET_ADDRESS" property="walletAddress" />
+        <result column="ASSET_TYPE" property="assetType" />
+        <result column="ASSET_ID" property="assetId" />
+        <result column="TOTAL_AMOUNT" property="totalAmount" />
+        <result column="AVAI_AMOUNT" property="avaiAmount" />
+        <result column="FROZEN_AMOUNT" property="frozenAmount" />
+        <result column="TRADE_ASSET_ID" property="tradeAssetId" />
+        <result column="TRADE_SYMBOL" property="tradeSymbol" />
+        <result column="TRADE_RATE" property="tradeRate" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        USER_ID, WALLET_ADDRESS, ASSET_TYPE, ASSET_ID, TOTAL_AMOUNT, AVAI_AMOUNT, FROZEN_AMOUNT
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" /> FROM asset_account WHERE _DB_STATE = 1
+		<if test="params.id != null and '' != params.id">AND _ID = #{params.id}</if>
+		<!-- 基础属性条件查询 -->
+        <if test="params.userId != null and '' != params.userId">AND USER_ID = #{params.userId}</if>
+        <if test="params.assetType != null and '' != params.assetType">AND ASSET_TYPE = #{params.assetType}</if>
+        <if test="params.assetId != null and '' != params.assetId">AND ASSET_ID = #{params.assetId}</if>
+        <if test="params.totalAmount != null and '' != params.totalAmount">AND TOTAL_AMOUNT = #{params.totalAmount}</if>
+        <if test="params.avaiAmount != null and '' != params.avaiAmount">AND AVAI_AMOUNT = #{params.avaiAmount}</if>
+        <if test="params.frozenAmount != null and '' != params.frozenAmount">AND FROZEN_AMOUNT = #{params.frozenAmount}</if>
+         <!-- 关键字模糊查询  -->
+        <if test="params.keywords != null and '' != params.keywords">
+            OR ( 1 != 1
+              OR USER_ID LIKE CONCAT('%',#{params.keywords},'%')
+              OR WALLET_ADDRESS LIKE CONCAT('%',#{params.keywords},'%')
+              OR ASSET_TYPE LIKE CONCAT('%',#{params.keywords},'%')
+              OR TOTAL_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+              OR AVAI_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+              OR FROZEN_AMOUNT LIKE CONCAT('%',#{params.keywords},'%')
+            )
+         </if>
+</select>
+
+<select id="selectTokenAccountAsset" resultMap="BaseResultMap">
+SELECT ACCOUNT.* ,
+       asset_issue.TRADE_ASSET_ID , asset_issue.TRADE_ASSET_SYMBOL , asset_issue.TRADE_RATE
+  FROM (
+            (
+            select asset_account.*
+            from asset_account
+            where ASSET_TYPE = 1
+            AND USER_ID = #{userId}
+            ) ACCOUNT
+       ) LEFT JOIN asset_issue on ACCOUNT.asset_id = asset_issue._id
+         ORDER BY _ID DESC
+</select>
+
+<select id="selectCreditAccountAsset" resultMap="BaseResultMap">
+SELECT ACCOUNT.* ,
+       asset_issue.asset_name,
+       asset_issue.TRADE_ASSET_ID , asset_issue.TRADE_ASSET_SYMBOL , asset_issue.TRADE_RATE
+  FROM (
+            (
+            select asset_account.*
+            from asset_account
+            where ASSET_TYPE = 0
+            AND USER_ID = #{userId}
+            ) ACCOUNT
+       ) LEFT JOIN asset_issue on ACCOUNT.asset_id = asset_issue._id
+         ORDER BY _ID DESC
+</select>
+
+
+
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zy.pointer.j2easy.business.asset.mapper.AssetIssueMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="zy.pointer.j2easy.business.asset.entity.AssetIssue"  extends="common.BaseEntityResultMap">
+        <result column="TYPE" property="type" />
+        <result column="USER_ID" property="userId" />
+        <result column="ASSET_SYMBOL" property="assetSymbol" />
+        <result column="ASSET_NAME" property="assetName" />
+        <result column="TRADE_SYMBOL" property="tradeSymbol" />
+        <result column="TRADE_RATE" property="tradeRate" />
+        <result column="MORTGAGE" property="mortgage" />
+        <result column="SUPPLY" property="supply" />
+        <result column="TRADE_ASSET_NAME" property="tradeAssetName" />
+        <result column="TRADE_ASSET_CNY_RATE" property="tradeAssetCNYRate" />
+    </resultMap>
+
+    <!-- 通用查询结果列  -->
+    <sql id="Base_Column_List">
+        _ID,
+        _CREATE_TIME,
+        _UPDATE_TIME,
+        _UPDATE_TRACE,
+        _DB_STATE,
+        TYPE, USER_ID, ASSET_SYMBOL, ASSET_NAME, TRADE_SYMBOL, TRADE_RATE, MORTGAGE, SUPPLY
+    </sql>
+
+
+<select id="selectByMapForPage" resultMap="BaseResultMap">
+		select asset_issue.* , t.asset_name TRADE_ASSET_NAME , t.TRADE_RATE TRADE_ASSET_CNY_RATE
+          from asset_issue inner join asset_issue t on asset_issue.TRADE_ASSET_ID = t._ID
+         where asset_issue.USER_ID = #{params.userId}
+</select>
+
+</mapper>
